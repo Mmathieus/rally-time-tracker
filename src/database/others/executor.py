@@ -1,12 +1,12 @@
 import subprocess
 from config import config
 
-# NOTE: Execute PostgreSQL query with configurable output options.
-def execute_query(sql=None, pager=False, header=True, capture=False, text=True):
+
+def execute_query(sql=None, pager=False, header=True, capture=False, text=True, check=True, postgres_db=False):    
     command = [
         "psql",
-        "-U", config.get('db_connection', {}).get('user'),
-        "-d", config.get('db_connection', {}).get('database')
+        "-U", config['db_connection']['user'],
+        "-d", config['db_connection']['database'] if not postgres_db else "postgres",
     ]
 
     if not pager:
@@ -19,7 +19,7 @@ def execute_query(sql=None, pager=False, header=True, capture=False, text=True):
         sql = "SELECT 'No SQL provided' AS message"
     command.extend(["-c", sql])
 
-    return subprocess.run(args=command, check=True, capture_output=capture, text=text)
+    return subprocess.run(args=command, check=check, capture_output=capture, text=text)
 
 # PSQL FLAGS REFERENCE:
 # -U username    : Connect as specified user

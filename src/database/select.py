@@ -1,5 +1,5 @@
-from utils import formatter as ff
-from database import executor
+from utils import formatter as ff, inputter as ii
+from database.others import executor as exe
 
 
 def _select_manager(search_term=None) -> None:
@@ -7,10 +7,15 @@ def _select_manager(search_term=None) -> None:
         _select_exec(loose_matching=True, searching_term=ff.upper_casing(term=search_term))
         return
     
-    rally = input("🗺️ RALLY: ").strip()
-    stage = input("🚥 STAGE: ").strip()
+    rally = ii.get_user_input(prompt="RALLY")
+    stage = ii.get_user_input(prompt="STAGE")
+
+    # # 🗺️ 🚥
+    # rally = input("🗺️ RALLY: ").strip()
+    # stage = input("🚥 STAGE: ").strip()
 
     _select_exec(rally=ff.upper_casing(term=rally), stage=ff.upper_casing(term=stage))
+
 
 def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -> None:
     SELECT_QUERY = "SELECT rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
@@ -27,4 +32,4 @@ def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -
             SELECT_QUERY += f" WHERE {' AND '.join(conditions)}" + ENDING
     
     print()
-    executor.execute_query(sql=SELECT_QUERY)
+    exe.execute_query(sql=SELECT_QUERY)

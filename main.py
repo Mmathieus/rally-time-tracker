@@ -1,6 +1,7 @@
-import src.utils.loader as ll
-import src.database.select as ss
-import src.database.setup as st
+import src.bootstrap as bb
+import database.select as ss
+import database.management.tables as st
+import database.management.database as db
 
 # ss.SELECT_manager(searching_term=None)
 
@@ -168,19 +169,23 @@ while True:
     if request == 'q':
         break
     if request == 's':
-        ss.SELECT_manager(searching_term=None)
+        ss._select_manager(search_term=None)
     if request == "table":
-        st._setup_manager(table_choice=None)
+        st._tables_manager(table_choice=None)
     if request == "table h":
-        st._setup_manager(table_choice="history")
+        st._tables_manager(table_choice="history")
     if request == "table m":
-        st._setup_manager(table_choice="main")
+        st._tables_manager(table_choice="main")
     if request == "table m drop":
         st.drop_TABLE(table="main")
     if request == "table h drop":
         st.drop_TABLE(table="history")
     if request == "table h refresh":
-        st._setup_manager(table_choice="history", operation_choice="refresh")
+        st._tables_manager(table_choice="history", operation_choice="refresh")
+    if request == "create database":
+        db.create_database()
+    if request == "drop database":
+        db.drop_database()
     
     # command, args, arg_count = process_INPUT(user_input=request)
     # if command in actions:

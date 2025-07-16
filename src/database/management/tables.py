@@ -1,6 +1,6 @@
 from config import config
-from database import executor as exe
-from utils import formatter as ff, visualizer as vv
+from database.others import executor as exe
+from utils import formatter as ff, menu as mm, inputter as ii
 
 
 CREATE_TIMINGS_TABLE_SQL = """
@@ -62,16 +62,18 @@ def validate_choice(choice, valid_options, choice_type) -> bool:
     return True
 
 
-def _setup_manager(table_choice=None, operation_choice=None, keep_data_choice=None) -> None:
+def _tables_manager(table_choice=None, operation_choice=None, keep_data_choice=None) -> None:
     if not table_choice:
-        table_choice = vv.get_input__display_menu(title="TABLE OPTIONS", options=tuple(tab.capitalize() for tab in TABLE_OPTIONS))
+        mm.display_menu(title="TABLE OPTIONS", options=tuple(tab.capitalize() for tab in TABLE_OPTIONS))
+        table_choice = ii.get_user_input()
     
     if not validate_choice(choice=table_choice, valid_options=TABLE_OPTIONS, choice_type="TABLE"):
         return
 
 
     if not operation_choice:
-        operation_choice = vv.get_input__display_menu(title="OPERATION OPTIONS", options=OPERATION_OPTIONS)
+        mm.display_menu(title="OPERATION OPTIONS", options=OPERATION_OPTIONS)
+        operation_choice = ii.get_user_input()
     
     if not validate_choice(choice=operation_choice, valid_options=tuple(op.lower() for op in OPERATION_OPTIONS), choice_type="OPERATION"):
         return
@@ -79,15 +81,16 @@ def _setup_manager(table_choice=None, operation_choice=None, keep_data_choice=No
 
     if operation_choice == "refresh":
         if not keep_data_choice:
-            keep_data_choice = vv.get_input__display_menu(title="KEEP DATA?", options=("Yes", "No"))
+            mm.display_menu(title="KEEP DATA?", options=("Yes", "No"))
+            keep_data_choice = ii.get_user_input()
         
         if not validate_choice(choice=keep_data_choice, valid_options=KEEP_DATA_CHOICES, choice_type="KEEP DATA"):
             return
     
-    _setup_exec(table=table_choice, operation=operation_choice, keep_data=keep_data_choice)
+    _tables_exec(table=table_choice, operation=operation_choice, keep_data=keep_data_choice)
 
 
-def _setup_exec(table, operation, keep_data) -> None:
+def _tables_exec(table, operation, keep_data) -> None:
     if operation == "create":
         create_table(table=table)
         return
@@ -148,7 +151,7 @@ def drop_table(table, confirmation=True) -> None:
     output = f"TABLE '{TABLE_CONFIG[table]['table_name']}'"
     
     if answer.stderr and "does not exist" in answer.stderr.strip():
-        ff.print_colored(text=f"{output} NOT DELETED - DOESN'T EXIST.\n", color="YELLOW")
+        ff.print_colored(text=f"{output} NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
         return
     
-    ff.print_colored(text=f"{output} DELETED.\n", color="GREEN", really_print=confirmation)
+    ff.print_colored(text=f"{output} DROPEED.\n", color="GREEN", really_print=confirmation)
