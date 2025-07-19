@@ -1,11 +1,14 @@
 import src.bootstrap as bb
 import database.select as ss
-import database.management.tables as st
+import database.management.tables as tb
 import database.management.database as db
+
+import utils.formatter as ff
+import utils.inputter as ii
 
 # ss.SELECT_manager(searching_term=None)
 
-# import sys
+import sys
 # sys.exit(0)
 
 import src.manager
@@ -160,7 +163,44 @@ actions = {
     }
 }
 
-print_colored(text="Welcome back Sir\n", color="CYAN")
+
+commands = {
+    'select' : {
+        'emoji' : '🔍',
+        'calls' : {
+            0 : lambda: ss._select_manager(),
+            1 : lambda ST : ss._select_manager(search_term=ST),
+            2 : lambda R, S : ss._select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
+        },
+        'info' : ("", "[rally/stage]", "[rally] [stage]")
+    },
+    'end' : {
+        'emoji' : '🛑',
+        'calls' : {
+            0 : lambda: sys.exit(0)
+        },
+        'info' : ("",)
+    }
+}   
+
+
+ff.print_colored(text="Welcome back Sir\n", color="CYAN")
+
+while True:
+    try:
+        request = ii.get_user_input(prompt="", symbol='💬', with_colon=False)
+        command, args, args_count = ii.parse_command_input(input_string=request)
+        
+        if command in commands:
+            if args_count in commands[command]['calls']:
+                func = commands[command]['calls'][args_count]
+                func(*args)
+    
+    except Exception as e:
+        ff.print_colored(text=f"PROBLEM: {e}", color="RED")
+
+
+
 
 while True:
     request = input("💬 ").strip()

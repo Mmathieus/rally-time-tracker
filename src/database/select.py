@@ -4,15 +4,11 @@ from database.others import executor as exe
 
 def _select_manager(search_term=None) -> None:
     if search_term:
-        _select_exec(loose_matching=True, searching_term=ff.upper_casing(term=search_term))
+        _select_exec(fuzzy_search=True, search_term=ff.upper_casing(term=search_term))
         return
     
     rally = ii.get_user_input(prompt="RALLY")
     stage = ii.get_user_input(prompt="STAGE")
-
-    # # 🗺️ 🚥
-    # rally = input("🗺️ RALLY: ").strip()
-    # stage = input("🚥 STAGE: ").strip()
 
     _select_exec(rally=ff.upper_casing(term=rally), stage=ff.upper_casing(term=stage))
 
