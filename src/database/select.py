@@ -15,17 +15,18 @@ def _select_manager(search_term=None) -> None:
 
 def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -> None:
     SELECT_QUERY = "SELECT rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
-    ENDING = " ORDER BY rally, stage, time DESC;"
     
     if fuzzy_search:
-        SELECT_QUERY += f" WHERE rally = '{search_term}' OR stage = '{search_term}'" + ENDING
+        SELECT_QUERY += f" WHERE rally = '{search_term}' OR stage = '{search_term}'"
     else:
         conditions = []
         if rally: conditions.append(f"rally = '{rally}'")
         if stage: conditions.append(f"stage = '{stage}'")
 
         if conditions != []:
-            SELECT_QUERY += f" WHERE {' AND '.join(conditions)}" + ENDING
+            SELECT_QUERY += f" WHERE {' AND '.join(conditions)}"
+        
+    SELECT_QUERY += " ORDER BY rally, time ASC, stage;"
     
     print()
     exe.execute_query(sql=SELECT_QUERY)

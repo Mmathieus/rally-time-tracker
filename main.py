@@ -1,7 +1,7 @@
 import src.bootstrap as bb
+
 import database.select as ss
-import database.management.tables as tb
-import database.management.database as db
+import database.create_refresh_drop as crd
 
 import utils.formatter as ff
 import utils.inputter as ii
@@ -167,36 +167,68 @@ actions = {
 
 commands = {
     'select' : {
-        'emoji' : '🔍',
-        'calls' : {
-            0 : lambda: ss._select_manager(),
-            1 : lambda ST : ss._select_manager(search_term=ST),
-            2 : lambda R, S : ss._select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
+        'emoji': '🔍',
+        'calls': {
+            0: lambda: ss._select_manager(),
+            1: lambda ST: ss._select_manager(search_term=ST),
+            2: lambda R, S: ss._select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
         },
-        'info' : ("", "[rally/stage]", "[rally] [stage]")
+        'args': {
+            0: (),
+            1: ("[search_term]",),
+            2: ("[rally]", "[stage]") 
+        }
     },
     'create' : {
-        'emoji' : '✳️',
-        'calls' : {
-            0 : lambda: ss._select_manager(),
-            1 : lambda ST : ss._select_manager(search_term=ST),
-            2 : lambda R, S : ss._select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
+        'emoji': '✳️',
+        'calls': {
+            1: lambda W: crd._create_exec(what=W)
         },
-        'info' : ("", "[rally/stage]", "[rally] [stage]")
+        'args': {
+            1: ("[main/history/db]",)
+        }
     },
-    'help' : {
-        'emoji' : '❓',
-        'calls' : {},
-        'info' : ("", "[command]")
-    },
-    'end' : {
-        'emoji' : '🛑',
-        'calls' : {
-            0 : lambda: sys.exit(0)
+    'refresh': {
+        'emoji': '🔄',
+        'calls': {
+            1: lambda T: crd._refresh_manager(table=T),
+            2: lambda T, KD: crd._refresh_manager(table=T, keep_data=KD)
         },
-        'info' : ("",)
+        'args': {
+            1: ("[main/history]",),
+            2: ("[main/history]", "[keep/lose]")
+        }
+    },
+    'drop' : {
+        'emoji': '💣',
+        'calls': {
+            1: lambda W : crd._drop_exec(what=W)
+        },
+        'args': {
+            1: ("[main/history/db]",)
+        }
+    },
+    'help': {
+        'emoji': '❓',
+        'calls': {},
+        'args': {
+            0: (),
+            1: ("[command]",)
+        }
+    },
+    'end': {
+        'emoji': '🛑',
+        'calls': {
+            0: lambda: sys.exit(0)
+        },
+        'args': {
+            0: ()
+        }
     }
-}   
+}
+commands['help']['calls'][0] = lambda: mm.display_main_menu(commands_dict=commands)
+commands['help']['calls'][1] = lambda CN: mm.display_command_arguments(command_name=CN, commands_dict=commands)
+
 
 
 ff.print_colored(text="Welcome back Sir\n", color="CYAN")
@@ -207,10 +239,6 @@ while True:
         command, args, args_count = ii.parse_command_input(input_string=request)
         
         if command in commands:
-            if command == "help":
-                mm.display_main_menu(commands_dict=commands)
-                continue
-
             if args_count in commands[command]['calls']:
                 func = commands[command]['calls'][args_count]
                 func(*args)

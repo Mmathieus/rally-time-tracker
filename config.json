@@ -7,7 +7,5 @@
         "timings": "main",
         "timings_history": "history",
         "timings & timings_history": "all"
-    },
-    "keep_data_on_table_refresh": true
-
+    }
 }
