@@ -5,6 +5,7 @@ import database.management.database as db
 
 import utils.formatter as ff
 import utils.inputter as ii
+import utils.menu as mm
 
 # ss.SELECT_manager(searching_term=None)
 
@@ -174,6 +175,20 @@ commands = {
         },
         'info' : ("", "[rally/stage]", "[rally] [stage]")
     },
+    'create' : {
+        'emoji' : '✳️',
+        'calls' : {
+            0 : lambda: ss._select_manager(),
+            1 : lambda ST : ss._select_manager(search_term=ST),
+            2 : lambda R, S : ss._select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
+        },
+        'info' : ("", "[rally/stage]", "[rally] [stage]")
+    },
+    'help' : {
+        'emoji' : '❓',
+        'calls' : {},
+        'info' : ("", "[command]")
+    },
     'end' : {
         'emoji' : '🛑',
         'calls' : {
@@ -192,6 +207,10 @@ while True:
         command, args, args_count = ii.parse_command_input(input_string=request)
         
         if command in commands:
+            if command == "help":
+                mm.display_main_menu(commands_dict=commands)
+                continue
+
             if args_count in commands[command]['calls']:
                 func = commands[command]['calls'][args_count]
                 func(*args)
