@@ -5,7 +5,10 @@
     },
     "table_references": {
         "timings": "main",
-        "timings_history": "history",
-        "timings & timings_history": "all"
+        "timings_history": "history"
+    },
+    "default_import_locations": {
+        "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
+        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
     }
 }

@@ -1,6 +1,8 @@
 from config import config
-from database.others import executor as exe
-from utils import formatter as ff, menu as mm, inputter as ii
+import database.others.executor as exe
+import utils.formatter as ff
+import utils.menu as mm
+import utils.inputter as ii
 
 
 CREATE_TIMINGS_TABLE_SQL = """

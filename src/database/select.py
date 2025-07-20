@@ -17,7 +17,8 @@ def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -
     SELECT_QUERY = "SELECT rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
     
     if fuzzy_search:
-        SELECT_QUERY += f" WHERE rally = '{search_term}' OR stage = '{search_term}'"
+        if search_term != '.':
+            SELECT_QUERY += f" WHERE rally = '{search_term}' OR stage = '{search_term}'"
     else:
         conditions = []
         if rally: conditions.append(f"rally = '{rally}'")

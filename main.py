@@ -2,6 +2,7 @@ import src.bootstrap as bb
 
 import database.select as ss
 import database.create_refresh_drop as crd
+import database._import as imprt 
 
 import utils.formatter as ff
 import utils.inputter as ii
@@ -185,7 +186,7 @@ commands = {
             1: lambda W: crd._create_exec(what=W)
         },
         'args': {
-            1: ("[main/history/db]",)
+            1: ("[table/db]",)
         }
     },
     'refresh': {
@@ -195,8 +196,8 @@ commands = {
             2: lambda T, KD: crd._refresh_manager(table=T, keep_data=KD)
         },
         'args': {
-            1: ("[main/history]",),
-            2: ("[main/history]", "[keep/lose]")
+            1: ("[table]",),
+            2: ("[table]", "[data_decision]")
         }
     },
     'drop' : {
@@ -205,7 +206,18 @@ commands = {
             1: lambda W : crd._drop_exec(what=W)
         },
         'args': {
-            1: ("[main/history/db]",)
+            1: ("[table/db]",)
+        }
+    },
+    'import': {
+        'emoji': '📥',
+        'calls': {
+            1: lambda T: imprt._import_manager(table=T),
+            2: lambda T, FS: imprt._import_manager(table=T, file_selection=FS)
+        },
+        'args': {
+            1: ("[table]",),
+            2: ("[table]", "[file_selction]")
         }
     },
     'help': {
