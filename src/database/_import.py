@@ -13,9 +13,9 @@ from tkinter import filedialog
 TIMINGS_ALIAS = config['table_references']['timings']
 TIMINGS_HISTORY_ALIAS = config['table_references']['timings_history']
 
-GUI = config['operations']['import']['file_selection_options']['GUI']
-DEFAULT = config['operations']['import']['file_selection_options']['Default']
-PATH = config['operations']['import']['file_selection_options']['Path']
+GUI = config['operations']['import_export']['file_selection_options']['GUI']
+DEFAULT = config['operations']['import_export']['file_selection_options']['Default']
+PATH = config['operations']['import_export']['file_selection_options']['Path']
 
 FILE_SELECTION_OPTIONS = (GUI, DEFAULT, PATH)
 
@@ -58,7 +58,7 @@ def _import_manager(table, file_selection=None):
     elif file_selection_choice == DEFAULT:
         default_exec(table=table)
     else:
-        file_path = ii.get_user_input(prompt="Enter the full path to the CSV file", lowercase=False)
+        file_path = ii.get_user_input(prompt="Enter the full path to the CSV file including the file name", lowercase=False)
         path_exec(table=table, file_path=file_path)
 
 

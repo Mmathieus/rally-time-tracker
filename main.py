@@ -3,6 +3,7 @@ import src.bootstrap as bb
 import database.select as ss
 import database.create_refresh_drop as crd
 import database._import as imprt 
+import database.export as exprt
 
 import utils.formatter as ff
 import utils.inputter as ii
@@ -214,6 +215,17 @@ commands = {
         'calls': {
             1: lambda T: imprt._import_manager(table=T),
             2: lambda T, FS: imprt._import_manager(table=T, file_selection=FS)
+        },
+        'args': {
+            1: ("[table]",),
+            2: ("[table]", "[file_selection]")
+        }
+    },
+    'export': {
+        'emoji': '📄',
+        'calls': {
+            1: lambda T: exprt._export_manager(table=T),
+            2: lambda T, FS: exprt._export_manager(table=T, file_selection=FS)
         },
         'args': {
             1: ("[table]",),

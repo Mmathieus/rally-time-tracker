@@ -11,12 +11,20 @@
         "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
         "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
     },
+    "default_export_locations": {
+        "timings": "C:/Users/matus/Desktop",
+        "timings_history": "C:/Users/matus/Desktop"
+    },
+    "default_export_filenames": {
+        "timings": "timings.csv",
+        "timings_history": "timings_history.csv"
+    },
     "operations": {
         "create_refresh_drop": {
             "database_reference": "db",
             "keep_data_options": ["y", "n", "yes", "no", "k", "l", "keep", "lose"]
         },
-        "import": {
+        "import_export": {
             "file_selection_options": {
                 "GUI": "gui",
                 "Default": "default",
