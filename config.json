@@ -10,5 +10,18 @@
     "default_import_locations": {
         "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
         "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
+    },
+    "operations": {
+        "create_refresh_drop": {
+            "database_reference": "db",
+            "keep_data_options": ["y", "n", "yes", "no", "k", "l", "keep", "lose"]
+        },
+        "import": {
+            "file_selection_options": {
+                "GUI": "gui",
+                "Default": "default",
+                "Path": "path"
+            }
+        }
     }
 }

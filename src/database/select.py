@@ -14,7 +14,7 @@ def _select_manager(search_term=None) -> None:
 
 
 def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -> None:
-    SELECT_QUERY = "SELECT rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
+    SELECT_QUERY = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
     
     if fuzzy_search:
         if search_term != '.':

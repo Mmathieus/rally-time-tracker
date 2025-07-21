@@ -2,110 +2,117 @@ from config import config
 import utils.inputter as ii
 import utils.formatter as ff
 import utils.menu as mm
+import utils.validator as vv
 import database.others.executor as exe
 
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 
-# IMPORT main
-# IMPORT main "C:..."   | exists, is_csv, is_file
-# IMPORT main gui
-# IMPORT main default
-
-## Funkcia na overenie suboru
-
-## Vlastna funckia pre GUI, Path a Default
-## samostatny exec pre GUI a Default, manager a exec pre Path 
-
 
 TIMINGS_ALIAS = config['table_references']['timings']
 TIMINGS_HISTORY_ALIAS = config['table_references']['timings_history']
 
-TABLE_OPTIONS = (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS)
+GUI = config['operations']['import']['file_selection_options']['GUI']
+DEFAULT = config['operations']['import']['file_selection_options']['Default']
+PATH = config['operations']['import']['file_selection_options']['Path']
 
-FILE_SELECTION_OPTIONS = ("path", "gui", "default")
+FILE_SELECTION_OPTIONS = (GUI, DEFAULT, PATH)
+
+TABLE_CONFIG = {
+    TIMINGS_ALIAS: {
+        'table_name': "timings",
+        'import_sql': "\\copy timings FROM '{file_path}' WITH (FORMAT csv);",
+        'default_location': config['default_import_locations']['timings']
+    },
+    TIMINGS_HISTORY_ALIAS: {
+        'table_name': "timings_history",
+        'import_sql': "\\copy timings_history FROM '{file_path}' WITH (FORMAT csv);",
+        'default_location': config['default_import_locations']['timings_history']
+    }
+}
+
 
 def _import_manager(table, file_selection=None):
-    if table not in TABLE_OPTIONS:
-        # ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
-        return
-
-    if not file_selection:
-        mm.display_menu(title="FILE OPTIONS", options=tuple(opt.capitalize() for opt in FILE_SELECTION_OPTIONS))
-        file_selection = ii.get_user_input()
-    
-    if file_selection not in FILE_SELECTION_OPTIONS:
-        # ff.print_colored(text=f"INVALID CHOICE '{selection_choice}'.\n", color="YELLOW")
+    if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
+        ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
-
-    if file_selection == "gui":
-        root = tk.Tk()
-        root.withdraw()
-        
-        file_path = filedialog.askopenfilename(
-            title="Select a CSV file",
-            filetypes=[("CSV files", "*.csv")]
-        )
-        
-        root.destroy()
-        
-        if not file_path:
-            return
-        
-        FilePath = Path(file_path)
-
-        IMPORT_TIMINGS_QUERY = f"\\copy timings FROM '{FilePath}' WITH (FORMAT csv);"
-        IMPORT_TIMINGS_HISTORY_QUERY = f"\\copy timings_history FROM '{FilePath}' WITH (FORMAT csv);"
-
-        if table == TIMINGS_ALIAS:
-            answer = exe.execute_query(sql=IMPORT_TIMINGS_QUERY, header=False, capture=True)
+    if file_selection:
+        if file_selection == GUI:
+            gui_exec(table=table)
+        elif file_selection == DEFAULT:
+            default_exec(table=table)
         else:
-            answer = exe.execute_query(sql=IMPORT_TIMINGS_HISTORY_QUERY, header=False, capture=True)
-        
-        print(answer)
-        ff.print_colored(text="IMPORT INTO (table_name) SUCCESFUL.\n", color="GREEN")
+            path_exec(table=table, file_path=file_selection)
+        return
+
+    mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in FILE_SELECTION_OPTIONS))
+    file_selection_choice = ii.get_user_input()
     
+    if not vv.validate_choice(choice=file_selection_choice, valid_options=FILE_SELECTION_OPTIONS, choice_type="FILE SELECTION"):
+        return
+    
+    if file_selection_choice == GUI:
+        gui_exec(table=table)
+    elif file_selection_choice == DEFAULT:
+        default_exec(table=table)
     else:
-        if file_selection == "path":
-            file_path = ii.get_user_input(prompt="Enter full path to .csv file", lowercase=False).replace('"', '').replace("'", '')
-            FilePath = Path(file_path)
-
-            if not FilePath.exists() or not FilePath.is_file() or FilePath.suffix.lower() != '.csv':
-                return
-
-            IMPORT_TIMINGS_QUERY = f"\\copy timings FROM '{FilePath}' WITH (FORMAT csv);"
-            IMPORT_TIMINGS_HISTORY_QUERY = f"\\copy timings_history FROM '{FilePath}' WITH (FORMAT csv);"
-
-            if table == TIMINGS_ALIAS:
-                answer = exe.execute_query(sql=IMPORT_TIMINGS_QUERY, header=False, capture=True)
-            else:
-                answer = exe.execute_query(sql=IMPORT_TIMINGS_HISTORY_QUERY, header=False, capture=True)
-            
-            print(answer)
-            ff.print_colored(text="IMPORT INTO (table_name) SUCCESFUL.\n", color="GREEN")
-        
-        if file_selection == "default":
-            if table == TIMINGS_ALIAS:
-                FilePath = Path(config['default_import_locations']['timings'])
-            else:
-                FilePath = Path(config['default_import_locations']['timings_history'])
-            
-            if not FilePath.exists() or not FilePath.is_file() or FilePath.suffix.lower() != '.csv':
-                return
-
-            IMPORT_TIMINGS_QUERY = f"\\copy timings FROM '{FilePath}' WITH (FORMAT csv);"
-            IMPORT_TIMINGS_HISTORY_QUERY = f"\\copy timings_history FROM '{FilePath}' WITH (FORMAT csv);"
-
-            if table == TIMINGS_ALIAS:
-                answer = exe.execute_query(sql=IMPORT_TIMINGS_QUERY, header=False, capture=True)
-            else:
-                answer = exe.execute_query(sql=IMPORT_TIMINGS_HISTORY_QUERY, header=False, capture=True)
-            
-            print(answer)
-            ff.print_colored(text="IMPORT INTO (table_name) SUCCESFUL.\n", color="GREEN")
+        file_path = ii.get_user_input(prompt="Enter the full path to the CSV file", lowercase=False)
+        path_exec(table=table, file_path=file_path)
 
 
-            
+def gui_exec(table):
+    root = tk.Tk()
+    root.withdraw()
+    
+    file_path = filedialog.askopenfilename(
+        title="Select a CSV file",
+        filetypes=[("CSV files", "*.csv")]
+    )
+    
+    root.destroy()
+    
+    if not file_path:
+        return
+    
+    FilePath = Path(file_path)
 
+    call_import(table=table, file_path=FilePath)
+
+def default_exec(table):
+    is_valid, FilePath = validate_file_path(path=TABLE_CONFIG[table]['default_location'])
+    
+    if not is_valid:
+        ff.print_colored(text=f"INVALID DEFAULT FILE PATH in config.json FOR TABLE '{TABLE_CONFIG[table]['table_name']}'.\n", color="YELLOW")
+        return
+    
+    call_import(table=table, file_path=FilePath)
+
+def path_exec(table, file_path):
+    is_valid, FilePath = validate_file_path(path=file_path)
+
+    if not is_valid:
+        ff.print_colored(text=f"INVALID FILE PATH.\n", color="YELLOW")
+        return
+
+    call_import(table=table, file_path=FilePath)
+
+
+def validate_file_path(path) -> tuple[bool, Path | None]: 
+    if not path.strip():
+        return False, None
+    
+    path = path.replace('"', '').replace("'", '')
+    
+    FilePath = Path(path)
+    FilePath = FilePath.resolve()
+    
+    if not FilePath.exists() or not FilePath.is_file() or FilePath.suffix.lower() != '.csv':
+        return False, FilePath
+    return True, FilePath
+
+def call_import(table, file_path):
+    result = exe.execute_query(sql=TABLE_CONFIG[table]['import_sql'].format(file_path=file_path), header=False, capture=True)
+
+    ff.print_colored(text=f"IMPORT INTO '{TABLE_CONFIG[table]['table_name']}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")

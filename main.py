@@ -217,7 +217,7 @@ commands = {
         },
         'args': {
             1: ("[table]",),
-            2: ("[table]", "[file_selction]")
+            2: ("[table]", "[file_selection]")
         }
     },
     'help': {

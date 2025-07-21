@@ -3,6 +3,7 @@ import database.others.executor as exe
 import utils.formatter as ff
 import utils.menu as mm
 import utils.inputter as ii
+import utils.validator as vv
 
 
 CREATE_TIMINGS_TABLE_SQL = """
@@ -28,13 +29,12 @@ CREATE_TIMINGS_HISTORY_TABLE_SQL = """
 """
 
 DATABASE_NAME = config['db_connection']['database']
+DATABASE_ALIAS = config['operations']['create_refresh_drop']['database_reference']
 
 TIMINGS_ALIAS = config['table_references']['timings']
 TIMINGS_HISTORY_ALIAS = config['table_references']['timings_history']
 
-TABLE_OPTIONS = (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS)
-
-CREATE_AND_DROP_OPTIONS = (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS, "db")
+CREATE_AND_DROP_OPTIONS = (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS, DATABASE_ALIAS)
 
 TABLE_CONFIG = {
     TIMINGS_ALIAS: {
@@ -54,7 +54,7 @@ def _create_exec(what) -> None:
     if what not in CREATE_AND_DROP_OPTIONS:
         return
     
-    if what == "db":
+    if what == DATABASE_ALIAS:
         create_database()
     else:
         create_table(table=what)
@@ -75,15 +75,17 @@ def create_database() -> None:
 
     answer = exe.execute_query(sql=query, header=False, capture=True, check=False, postgres_db=True)
 
+    output = f"DATABASE '{DATABASE_NAME}'"
+
     if answer.stderr and "already exists" in answer.stderr.strip():
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
+        ff.print_colored(text=f"{output} NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
         return
 
-    ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' CREATED.\n", color="GREEN")
+    ff.print_colored(text=f"{output} CREATED.\n", color="GREEN")
 
 
 def _refresh_manager(table, keep_data=None) -> None:
-    if table not in TABLE_OPTIONS:
+    if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE NAME '{table}'.\n", color="YELLOW")
         return
     
@@ -91,7 +93,7 @@ def _refresh_manager(table, keep_data=None) -> None:
         mm.display_menu(title="KEEP DATA?", options=("Yes", "No"))
         keep_data = ii.get_user_input()
         
-    if not validate_choice(choice=keep_data, valid_options=('y', 'n', "yes", "no", "keep", "lose"), choice_type="KEEP DATA"):
+    if not vv.validate_choice(choice=keep_data, valid_options=config['operations']['create_refresh_drop']['keep_data_options'], choice_type="KEEP DATA"):
         return
     
     refresh_table(table=table, keep_data=keep_data)
@@ -100,10 +102,7 @@ def refresh_table(table, keep_data) -> None:
     table_name = TABLE_CONFIG[table]['table_name']
 
     exists = exe.execute_query(
-        sql=f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = '{table_name}');",
-        header=False,
-        capture=True
-    )
+        sql=f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = '{table_name}');", header=False, capture=True)
     
     if exists.stdout.strip() == 'f':
         ff.print_colored(text=f"TABLE '{table_name}' NOT REFRESHED - DOESN'T EXIST.\n", color="YELLOW")
@@ -121,18 +120,20 @@ def refresh_table(table, keep_data) -> None:
             COMMIT;
         """
         exe.execute_query(sql=transaction, header=False, capture=True)
+        STATUS = "DATA KEPT."
     else:
         drop_table(table=table, confirmation=False)
         create_table(table=table, confirmation=False)
+        STATUS = "DATA LOST."
     
-    ff.print_colored(text=f"TABLE '{table_name}' REFRESHED.\n", color="GREEN")
+    ff.print_colored(text=f"TABLE '{table_name}' REFRESHED. {STATUS}\n", color="GREEN")
 
 
 def _drop_exec(what) -> None:
     if what not in CREATE_AND_DROP_OPTIONS:
         return
     
-    if what == "db":
+    if what == DATABASE_ALIAS:
         drop_database()
     else:
         drop_table(table=what)
@@ -153,21 +154,10 @@ def drop_database() -> None:
 
     answer = exe.execute_query(sql=query, header=False, capture=True, postgres_db=True)
 
+    output = f"DATABASE '{DATABASE_NAME}'"
+
     if answer.stderr and "does not exist" in answer.stderr.strip():
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
+        ff.print_colored(text=f"{output} NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
         return
 
-    ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' DROPPED.\n", color="GREEN")
-
-
-
-def validate_choice(choice, valid_options, choice_type) -> bool:
-    """Validate user choice against valid options."""
-    if not choice:
-        return False
-    
-    if choice not in valid_options:
-        ff.print_colored(text=f"INVALID {choice_type} CHOICE.\n", color="RED")
-        return False
-    
-    return True
+    ff.print_colored(text=f"{output} DROPPED.\n", color="GREEN")
