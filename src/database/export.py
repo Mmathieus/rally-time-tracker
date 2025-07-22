@@ -37,7 +37,7 @@ TABLE_CONFIG = {
 }
 
 
-def _export_manager(table, file_selection=None):
+def _export_manager(table, file_selection=None) -> None:
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
@@ -66,7 +66,7 @@ def _export_manager(table, file_selection=None):
         path_exec(table=table, file_path=file_path)
 
 
-def gui_exec(table):
+def gui_exec(table) -> None:
     root = tk.Tk()
     root.withdraw()
     
@@ -89,7 +89,7 @@ def gui_exec(table):
 
     call_export(table=table, file_path=FilePath)
 
-def default_exec(table):
+def default_exec(table) -> None:
     is_valid, DirPath = validate_directory_path(path=TABLE_CONFIG[table]['default_location'])
     
     if not is_valid:
@@ -106,7 +106,7 @@ def default_exec(table):
     
     call_export(table=table, file_path=FilePath)
 
-def path_exec(table, file_path):
+def path_exec(table, file_path) -> None:
     is_valid, FilePath = validate_file_path(path=file_path)
 
     if not is_valid:

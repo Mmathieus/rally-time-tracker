@@ -4,6 +4,7 @@ import database.select as ss
 import database.create_refresh_drop as crd
 import database._import as imprt 
 import database.export as exprt
+import database.psql as psql
 
 import utils.formatter as ff
 import utils.inputter as ii
@@ -230,6 +231,15 @@ commands = {
         'args': {
             1: ("[table]",),
             2: ("[table]", "[file_selection]")
+        }
+    },
+    'psql': {
+        'emoji': '🐘',
+        'calls': {
+            0: lambda: psql.psql_exec()
+        },
+        'args': {
+            0: ()
         }
     },
     'help': {

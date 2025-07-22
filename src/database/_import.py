@@ -33,7 +33,7 @@ TABLE_CONFIG = {
 }
 
 
-def _import_manager(table, file_selection=None):
+def _import_manager(table, file_selection=None) -> None:
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
@@ -62,7 +62,7 @@ def _import_manager(table, file_selection=None):
         path_exec(table=table, file_path=file_path)
 
 
-def gui_exec(table):
+def gui_exec(table) -> None:
     root = tk.Tk()
     root.withdraw()
     
@@ -80,7 +80,7 @@ def gui_exec(table):
 
     call_import(table=table, file_path=FilePath)
 
-def default_exec(table):
+def default_exec(table) -> None:
     is_valid, FilePath = validate_file_path(path=TABLE_CONFIG[table]['default_location'])
     
     if not is_valid:
@@ -89,7 +89,7 @@ def default_exec(table):
     
     call_import(table=table, file_path=FilePath)
 
-def path_exec(table, file_path):
+def path_exec(table, file_path) -> None:
     is_valid, FilePath = validate_file_path(path=file_path)
 
     if not is_valid:
@@ -112,7 +112,7 @@ def validate_file_path(path) -> tuple[bool, Path | None]:
         return False, FilePath
     return True, FilePath
 
-def call_import(table, file_path):
+def call_import(table, file_path) -> None:
     result = exe.execute_query(sql=TABLE_CONFIG[table]['import_sql'].format(file_path=file_path), header=False, capture=True)
 
     ff.print_colored(text=f"IMPORT INTO '{TABLE_CONFIG[table]['table_name']}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")

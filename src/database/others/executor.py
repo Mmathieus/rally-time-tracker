@@ -15,9 +15,12 @@ def execute_query(sql=None, pager=False, header=True, capture=False, text=True, 
     if not header:
         command.append("-t")
     
-    if sql is None:
-        sql = "SELECT 'No SQL provided' AS message"
-    command.extend(["-c", sql])
+    if sql:
+        command.extend(["-c", sql])
+
+    # if sql is None:
+    #     sql = "SELECT 'No SQL provided' AS message"
+    # command.extend(["-c", sql])
 
     return subprocess.run(args=command, check=check, capture_output=capture, text=text)
 
