@@ -42,7 +42,11 @@ def _export_manager(table, file_selection=None) -> None:
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
-    if not vv.validate_db_status(table=TABLE_CONFIG[table]['table_name']):
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
+    
+    exists, info_message = vv.validate_db_status(table=TABLE_NAME)
+    if not exists:
+        ff.print_colored(text=f"EXPORT FROM '{TABLE_NAME}' UNSUCCESSFUL. {info_message}\n", color="YELLOW")
         return
     
     if file_selection:
@@ -94,15 +98,17 @@ def gui_exec(table) -> None:
 
 def default_exec(table) -> None:
     is_valid, DirPath = validate_directory_path(path=TABLE_CONFIG[table]['default_location'])
+
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
     
     if not is_valid:
-        ff.print_colored(text=f"INVALID DEFAULT DIRECTORY PATH in config.json FOR TABLE '{TABLE_CONFIG[table]['table_name']}'.\n", color="YELLOW")
+        ff.print_colored(text=f"INVALID DEFAULT DIRECTORY PATH in config.json FOR TABLE '{TABLE_NAME}'.\n", color="YELLOW")
         return
     
     is_valid, FileName = validate_csv_filename(filename=TABLE_CONFIG[table]['default_filename'])
     
     if not is_valid:
-        ff.print_colored(text=f"INVALID DEFAULT FILENAME in config.json FOR TABLE '{TABLE_CONFIG[table]['table_name']}'.\n", color="YELLOW")
+        ff.print_colored(text=f"INVALID DEFAULT FILENAME in config.json FOR TABLE '{TABLE_NAME}'.\n", color="YELLOW")
         return
     
     FilePath = DirPath / FileName

@@ -22,7 +22,10 @@
     "operations": {
         "create_refresh_drop": {
             "database_reference": "db",
-            "keep_data_options": ["y", "n", "yes", "no", "k", "l", "keep", "lose"]
+            "data_options": {
+                "keep": ["y", "yes", "k", "keep"],
+                "lose": ["n", "no", "l", "lose"]
+            }
         },
         "import_export": {
             "file_selection_options": {

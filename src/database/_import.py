@@ -38,7 +38,11 @@ def _import_manager(table, file_selection=None) -> None:
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
-    if not vv.validate_db_status(table=TABLE_CONFIG[table]['table_name']):
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
+    
+    exists, info_message = vv.validate_db_status(table=TABLE_NAME)
+    if not exists:
+        ff.print_colored(text=f"IMPORT INTO '{TABLE_NAME}' UNSUCCESSFUL. {info_message}\n", color="YELLOW")
         return
     
     if file_selection:

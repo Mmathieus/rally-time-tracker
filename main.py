@@ -9,6 +9,7 @@ import database.psql as psql
 import utils.formatter as ff
 import utils.inputter as ii
 import utils.menu as mm
+import utils.restarter as rr
 
 # ss.SELECT_manager(searching_term=None)
 
@@ -231,6 +232,15 @@ commands = {
         'args': {
             1: ("[table]",),
             2: ("[table]", "[file_selection]")
+        }
+    },
+    'restart': {
+        'emoji': '🔄',
+        'calls': {
+            0: lambda: rr.restart_exec()
+        },
+        'args': {
+            0: ()
         }
     },
     'psql': {

@@ -36,6 +36,9 @@ TIMINGS_HISTORY_ALIAS = config['table_references']['timings_history']
 
 CREATE_AND_DROP_OPTIONS = (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS, DATABASE_ALIAS)
 
+DATA_OPTIONS_KEEP = config['operations']['create_refresh_drop']['data_options']['keep']
+DATA_OPTIONS = DATA_OPTIONS_KEEP + config['operations']['create_refresh_drop']['data_options']['lose']
+
 TABLE_CONFIG = {
     TIMINGS_ALIAS: {
         'table_name': "timings",
@@ -62,8 +65,9 @@ def _create_exec(what) -> None:
 def create_table(table, confirmation=True) -> None:
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
     
-    if vv.validate_db_status(table=TABLE_NAME, table_print=False):
-        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
+    exists, info_message = vv.validate_db_status(table=TABLE_NAME, must_exist=False)
+    if exists:
+        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
     exe.execute_query(sql=TABLE_CONFIG[table]['create_sql'], header=False, capture=True)
@@ -72,8 +76,9 @@ def create_table(table, confirmation=True) -> None:
     config['db_status'][TABLE_NAME] = True
 
 def create_database() -> None:
-    if vv.validate_db_status(db_print=False):
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
+    exists, info_message = vv.validate_db_status(must_exist=False)
+    if exists:
+        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
     exe.execute_query(sql=f"CREATE DATABASE {DATABASE_NAME};", header=False, capture=True, check=False, postgres_db=True)
@@ -89,15 +94,16 @@ def _refresh_manager(table, keep_data=None) -> None:
     
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
     
-    if not vv.validate_db_status(table=TABLE_NAME, table_print=False):
-        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT REFRESHED - DOESN'T EXIST.\n", color="YELLOW")
+    exists, info_message = vv.validate_db_status(table=TABLE_NAME)
+    if not exists:
+        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT REFRESHED. {info_message}\n", color="YELLOW")
         return
     
     if not keep_data:
         mm.display_menu(title="KEEP DATA?", options=("Yes", "No"))
         keep_data = ii.get_user_input()
         
-    if not vv.validate_choice(choice=keep_data, valid_options=config['operations']['create_refresh_drop']['keep_data_options'], choice_type="KEEP DATA"):
+    if not vv.validate_choice(choice=keep_data, valid_options=DATA_OPTIONS, choice_type="KEEP DATA"):
         return
     
     refresh_table(table=table, keep_data=keep_data)
@@ -106,7 +112,7 @@ def refresh_table(table, keep_data) -> None:
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
 
     STATUS = "DATA KEPT"
-    if keep_data.startswith('y') or keep_data == "keep":
+    if keep_data in DATA_OPTIONS_KEEP:
         transaction = f"""
             BEGIN;
             
@@ -139,8 +145,9 @@ def drop_table(table, confirmation=True) -> None:
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
     beginning = f"TABLE '{TABLE_NAME}'"
     
-    if not vv.validate_db_status(table=TABLE_NAME, table_print=False):
-        ff.print_colored(text=f"{beginning} NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
+    exists, info_message = vv.validate_db_status(table=TABLE_NAME)
+    if not exists:
+        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
     exe.execute_query(sql=TABLE_CONFIG[table]['drop_sql'], header=False, capture=True)
@@ -149,11 +156,12 @@ def drop_table(table, confirmation=True) -> None:
     config['db_status'][TABLE_NAME] = False
 
 def drop_database() -> None:
-    if not vv.validate_db_status(db_print=False):
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
+    exists, info_message = vv.validate_db_status()
+    if not exists:
+        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
     exe.execute_query(sql=f"DROP DATABASE IF EXISTS {DATABASE_NAME};", header=False, capture=True, postgres_db=True)
 
     ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' DROPPED.\n", color="GREEN")
-    config['db_status']['database'] = False
+    config['db_status'] = dict.fromkeys(config['db_status'].keys(), False)
