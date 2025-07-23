@@ -1,8 +1,13 @@
 from utils import formatter as ff, inputter as ii
 from database.others import executor as exe
+from config import config
+import utils.validator as vv
 
 
 def _select_manager(search_term=None) -> None:
+    if not vv.validate_db_status(table="timings"):
+        return
+    
     if search_term:
         _select_exec(fuzzy_search=True, search_term=ff.upper_casing(term=search_term))
         return
@@ -14,6 +19,9 @@ def _select_manager(search_term=None) -> None:
 
 
 def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -> None:
+    if not vv.validate_db_status(table="timings"):
+        return
+
     SELECT_QUERY = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
     
     if fuzzy_search:

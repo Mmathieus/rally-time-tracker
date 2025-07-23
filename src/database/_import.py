@@ -38,6 +38,9 @@ def _import_manager(table, file_selection=None) -> None:
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
+    if not vv.validate_db_status(table=TABLE_CONFIG[table]['table_name']):
+        return
+    
     if file_selection:
         if file_selection == GUI:
             gui_exec(table=table)

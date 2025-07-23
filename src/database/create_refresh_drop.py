@@ -60,33 +60,37 @@ def _create_exec(what) -> None:
         create_table(table=what)
 
 def create_table(table, confirmation=True) -> None:
-    answer = exe.execute_query(sql=TABLE_CONFIG[table]['create_sql'], header=False, capture=True)
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
     
-    output = f"TABLE '{TABLE_CONFIG[table]['table_name']}'"
-    
-    if answer.stderr and "already exists" in answer.stderr.strip():
-        ff.print_colored(text=f"{output} NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
+    if vv.validate_db_status(table=TABLE_NAME, table_print=False):
+        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
         return
+
+    exe.execute_query(sql=TABLE_CONFIG[table]['create_sql'], header=False, capture=True)
     
-    ff.print_colored(text=f"{output} CREATED.\n", color="GREEN", really_print=confirmation)
+    ff.print_colored(text=f"TABLE '{TABLE_NAME}' CREATED.\n", color="GREEN", really_print=confirmation)
+    config['db_status'][TABLE_NAME] = True
 
 def create_database() -> None:
-    query = f"CREATE DATABASE {DATABASE_NAME}"
-
-    answer = exe.execute_query(sql=query, header=False, capture=True, check=False, postgres_db=True)
-
-    output = f"DATABASE '{DATABASE_NAME}'"
-
-    if answer.stderr and "already exists" in answer.stderr.strip():
-        ff.print_colored(text=f"{output} NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
+    if vv.validate_db_status(db_print=False):
+        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED - ALREADY EXISTS.\n", color="YELLOW")
         return
 
-    ff.print_colored(text=f"{output} CREATED.\n", color="GREEN")
+    exe.execute_query(sql=f"CREATE DATABASE {DATABASE_NAME};", header=False, capture=True, check=False, postgres_db=True)
+
+    ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' CREATED.\n", color="GREEN")
+    config['db_status']['database'] = True
 
 
 def _refresh_manager(table, keep_data=None) -> None:
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE NAME '{table}'.\n", color="YELLOW")
+        return
+    
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
+    
+    if not vv.validate_db_status(table=TABLE_NAME, table_print=False):
+        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT REFRESHED - DOESN'T EXIST.\n", color="YELLOW")
         return
     
     if not keep_data:
@@ -99,34 +103,27 @@ def _refresh_manager(table, keep_data=None) -> None:
     refresh_table(table=table, keep_data=keep_data)
 
 def refresh_table(table, keep_data) -> None:
-    table_name = TABLE_CONFIG[table]['table_name']
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
 
-    exists = exe.execute_query(
-        sql=f"SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = '{table_name}');", header=False, capture=True)
-    
-    if exists.stdout.strip() == 'f':
-        ff.print_colored(text=f"TABLE '{table_name}' NOT REFRESHED - DOESN'T EXIST.\n", color="YELLOW")
-        return
-    
+    STATUS = "DATA KEPT"
     if keep_data.startswith('y') or keep_data == "keep":
         transaction = f"""
             BEGIN;
             
-            CREATE TEMP TABLE {table_name}_backup AS SELECT * FROM {table_name};
+            CREATE TEMP TABLE {TABLE_NAME}_backup AS SELECT * FROM {TABLE_NAME};
             {TABLE_CONFIG[table]['drop_sql']}
             {TABLE_CONFIG[table]['create_sql']}
-            INSERT INTO {table_name} SELECT * FROM {table_name}_backup;
+            INSERT INTO {TABLE_NAME} SELECT * FROM {TABLE_NAME}_backup;
             
             COMMIT;
         """
         exe.execute_query(sql=transaction, header=False, capture=True)
-        STATUS = "DATA KEPT."
     else:
         drop_table(table=table, confirmation=False)
         create_table(table=table, confirmation=False)
-        STATUS = "DATA LOST."
+        STATUS = "DATA LOST"
     
-    ff.print_colored(text=f"TABLE '{table_name}' REFRESHED. {STATUS}\n", color="GREEN")
+    ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {STATUS}.\n", color="GREEN")
 
 
 def _drop_exec(what) -> None:
@@ -139,25 +136,24 @@ def _drop_exec(what) -> None:
         drop_table(table=what)
 
 def drop_table(table, confirmation=True) -> None:
-    answer = exe.execute_query(sql=TABLE_CONFIG[table]['drop_sql'], header=False, capture=True)
+    TABLE_NAME = TABLE_CONFIG[table]['table_name']
+    beginning = f"TABLE '{TABLE_NAME}'"
     
-    output = f"TABLE '{TABLE_CONFIG[table]['table_name']}'"
-    
-    if answer.stderr and "does not exist" in answer.stderr.strip():
-        ff.print_colored(text=f"{output} NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
+    if not vv.validate_db_status(table=TABLE_NAME, table_print=False):
+        ff.print_colored(text=f"{beginning} NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
         return
+
+    exe.execute_query(sql=TABLE_CONFIG[table]['drop_sql'], header=False, capture=True)
     
-    ff.print_colored(text=f"{output} DROPPED.\n", color="GREEN", really_print=confirmation)
+    ff.print_colored(text=f"{beginning} DROPPED.\n", color="GREEN", really_print=confirmation)
+    config['db_status'][TABLE_NAME] = False
 
 def drop_database() -> None:
-    query = f"DROP DATABASE IF EXISTS {DATABASE_NAME};"
-
-    answer = exe.execute_query(sql=query, header=False, capture=True, postgres_db=True)
-
-    output = f"DATABASE '{DATABASE_NAME}'"
-
-    if answer.stderr and "does not exist" in answer.stderr.strip():
-        ff.print_colored(text=f"{output} NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
+    if not vv.validate_db_status(db_print=False):
+        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED - DOESN'T EXIST.\n", color="YELLOW")
         return
 
-    ff.print_colored(text=f"{output} DROPPED.\n", color="GREEN")
+    exe.execute_query(sql=f"DROP DATABASE IF EXISTS {DATABASE_NAME};", header=False, capture=True, postgres_db=True)
+
+    ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' DROPPED.\n", color="GREEN")
+    config['db_status']['database'] = False
