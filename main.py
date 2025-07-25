@@ -1,17 +1,17 @@
-import src.bootstrap as bb
+import src.bootstrap
 
-import database.select as ss
-import database.create_refresh_drop as crd
-import database._import as imprt 
-import database.export as exprt
-import database.psql as psql
-
-import utils.formatter as ff
 import utils.inputter as ii
+import utils.formatter as ff
 import utils.menu as mm
-import utils.restarter as rr
+import utils.other as oo
 
-import sys
+import database.select as slct
+import database.create_refresh_drop as crd
+import database.import_ as imprt 
+import database.export as exprt
+import database.other as othr
+
+import traceback
 
 # # sys.exit(0)
 
@@ -172,9 +172,9 @@ commands = {
     'select' : {
         'emoji': '🔍',
         'calls': {
-            0: lambda: ss._select_manager(),
-            1: lambda ST: ss._select_manager(search_term=ST),
-            2: lambda R, S: ss._select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
+            0: lambda: slct.select_manager(),
+            1: lambda ST: slct.select_manager(search_term=ST),
+            2: lambda R, S: slct.select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
         },
         'args': {
             0: (),
@@ -185,7 +185,7 @@ commands = {
     'create' : {
         'emoji': '✳️',
         'calls': {
-            1: lambda W: crd._create_exec(what=W)
+            1: lambda W: crd.create_exec(target=W)
         },
         'args': {
             1: ("[table/db]",)
@@ -194,8 +194,8 @@ commands = {
     'refresh': {
         'emoji': '🔄',
         'calls': {
-            1: lambda T: crd._refresh_manager(table=T),
-            2: lambda T, KD: crd._refresh_manager(table=T, keep_data=KD)
+            1: lambda T: crd.refresh_manager(table=T),
+            2: lambda T, KD: crd.refresh_manager(table=T, keep_data=KD)
         },
         'args': {
             1: ("[table]",),
@@ -205,7 +205,7 @@ commands = {
     'drop' : {
         'emoji': '💣',
         'calls': {
-            1: lambda W : crd._drop_exec(what=W)
+            1: lambda W : crd.drop_exec(target=W)
         },
         'args': {
             1: ("[table/db]",)
@@ -214,29 +214,38 @@ commands = {
     'import': {
         'emoji': '📥',
         'calls': {
-            1: lambda T: imprt._import_manager(table=T),
-            2: lambda T, FS: imprt._import_manager(table=T, file_selection=FS)
+            1: lambda T: imprt.import_manager(table=T),
+            2: lambda T, FS: imprt.import_manager(table=T, method=FS)
         },
         'args': {
             1: ("[table]",),
-            2: ("[table]", "[file_selection]")
+            2: ("[table]", "[method]")
         }
     },
     'export': {
         'emoji': '📄',
         'calls': {
-            1: lambda T: exprt._export_manager(table=T),
-            2: lambda T, FS: exprt._export_manager(table=T, file_selection=FS)
+            1: lambda T: exprt.export_manager(table=T),
+            2: lambda T, FS: exprt.export_manager(table=T, method=FS)
         },
         'args': {
             1: ("[table]",),
-            2: ("[table]", "[file_selection]")
+            2: ("[table]", "[method]")
+        }
+    },
+    'status': {
+        'emoji': '📊',
+        'calls': {
+            0: lambda: mm.print_dashboard()
+        },
+        'args': {
+            0: ()
         }
     },
     'restart': {
         'emoji': '🔄',
         'calls': {
-            0: lambda: rr.restart_exec()
+            0: lambda: oo.restart_exec()
         },
         'args': {
             0: ()
@@ -245,7 +254,7 @@ commands = {
     'psql': {
         'emoji': '🐘',
         'calls': {
-            0: lambda: psql.psql_exec()
+            0: lambda: othr.psql_exec()
         },
         'args': {
             0: ()
@@ -262,7 +271,7 @@ commands = {
     'end': {
         'emoji': '🛑',
         'calls': {
-            0: lambda: sys.exit(0)
+            0: lambda: oo.end_exec()
         },
         'args': {
             0: ()
@@ -272,7 +281,8 @@ commands = {
 commands['help']['calls'][0] = lambda: mm.display_main_menu(commands_dict=commands)
 commands['help']['calls'][1] = lambda CN: mm.display_command_arguments(command_name=CN, commands_dict=commands)
 
-
+import pprint
+from config import config
 
 ff.print_colored(text="Welcome back Sir\n", color="CYAN")
 
@@ -288,41 +298,4 @@ while True:
     
     except Exception as e:
         ff.print_colored(text=f"PROBLEM: {e}", color="RED")
-
-
-
-
-while True:
-    request = input("💬 ").strip()
-    if not request:
-        continue
-    if request == 'q':
-        break
-    if request == 's':
-        ss._select_manager(search_term=None)
-    if request == "table":
-        st._tables_manager(table_choice=None)
-    if request == "table h":
-        st._tables_manager(table_choice="history")
-    if request == "table m":
-        st._tables_manager(table_choice="main")
-    if request == "table m drop":
-        st.drop_TABLE(table="main")
-    if request == "table h drop":
-        st.drop_TABLE(table="history")
-    if request == "table h refresh":
-        st._tables_manager(table_choice="history", operation_choice="refresh")
-    if request == "create database":
-        db.create_database()
-    if request == "drop database":
-        db.drop_database()
-    
-    # command, args, arg_count = process_INPUT(user_input=request)
-    # if command in actions:
-    #     try:
-    #         if arg_count in actions[command]["calls"]:
-    #             actions[command]["calls"][arg_count](*args)
-    #         #Tracker.look()
-    #     except Exception as e:
-    #         error_info(e)
-
+        ff.print_colored(text=f"Detaily:\n{traceback.format_exc()}\n", color="YELLOW")

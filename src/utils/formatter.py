@@ -3,7 +3,7 @@ def upper_casing(term) -> str:
     return '-'.join([word.capitalize() for word in term.split('-')])
 
 
-colors = {
+_colors = {
     "RED" : "\033[31m",
     "CYAN" : "\033[36m",
     "GREEN" : "\033[32m",
@@ -12,9 +12,9 @@ colors = {
     "RESET" : "\033[0m"
 }
 
-def colorize(text, color) -> str:
-    return f"{colors[color]}{text}{colors['RESET']}"
-
 def print_colored(text, color, really_print=True) -> None:
     if really_print:
         print(colorize(text, color))
+
+def colorize(text, color) -> str:
+    return f"{_colors[color]}{text}{_colors['RESET']}"

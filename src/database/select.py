@@ -1,24 +1,25 @@
-from utils import formatter as ff, inputter as ii
-from database.others import executor as exe
-from config import config
-import utils.validator as vv
+import utils.inputter as ii
+import utils.formatter as ff
+import utils.other as oo
+
+import database.tools.executor as exe
 
 
-def _select_manager(search_term=None) -> None:
-    if not check_db_status():
+def select_manager(search_term=None) -> None:
+    if not _exists_timings():
         return
     
     if search_term:
-        _select_exec(fuzzy_search=True, search_term=ff.upper_casing(term=search_term))
+        select_exec(fuzzy_search=True, search_term=ff.upper_casing(term=search_term))
         return
     
     rally = ii.get_user_input(prompt="RALLY")
     stage = ii.get_user_input(prompt="STAGE")
 
-    _select_exec(rally=ff.upper_casing(term=rally), stage=ff.upper_casing(term=stage))
+    select_exec(rally=ff.upper_casing(term=rally), stage=ff.upper_casing(term=stage))
 
-def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -> None:
-    if not check_db_status():
+def select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -> None:
+    if not _exists_timings():
         return
 
     SELECT_QUERY = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
@@ -40,10 +41,9 @@ def _select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) -
     exe.execute_query(sql=SELECT_QUERY)
 
 
-def check_db_status() -> bool:
-    exists, info_message = vv.validate_db_status(table="timings")
+def _exists_timings() -> bool:
+    exists, info_message = oo.get_db_exists_state(table="timings")
     if not exists:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return False
     return True
-

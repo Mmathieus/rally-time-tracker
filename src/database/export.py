@@ -1,23 +1,25 @@
-from config import config
+import config as cnfg
+
 import utils.inputter as ii
 import utils.formatter as ff
-import utils.menu as mm
 import utils.validator as vv
-import database.others.executor as exe
+import utils.menu as mm
+import utils.other as oo
+
+import database.tools.executor as exe
 
 from pathlib import Path
-import tkinter as tk
 from tkinter import filedialog
-
+import tkinter as tk
 import re
 
 
-TIMINGS_ALIAS = config['table_references']['timings']
-TIMINGS_HISTORY_ALIAS = config['table_references']['timings_history']
+TIMINGS_ALIAS = cnfg.config['table_references']['timings']
+TIMINGS_HISTORY_ALIAS = cnfg.config['table_references']['timings_history']
 
-GUI = config['operations']['import_export']['file_selection_options']['GUI']
-DEFAULT = config['operations']['import_export']['file_selection_options']['Default']
-PATH = config['operations']['import_export']['file_selection_options']['Path']
+GUI = cnfg.config['operations']['import_export']['file_selection_options']['GUI']
+DEFAULT = cnfg.config['operations']['import_export']['file_selection_options']['Default']
+PATH = cnfg.config['operations']['import_export']['file_selection_options']['Path']
 
 FILE_SELECTION_OPTIONS = (GUI, DEFAULT, PATH)
 
@@ -25,55 +27,53 @@ TABLE_CONFIG = {
     TIMINGS_ALIAS: {
         'table_name': "timings",
         'export_sql': "\\copy timings TO '{file_path}' WITH (FORMAT csv);",
-        'default_location': config['default_export_locations']['timings'],
-        'default_filename': config['default_export_filenames']['timings']
+        'default_location': cnfg.config['default_export_locations']['timings'],
+        'default_filename': cnfg.config['default_export_filenames']['timings']
     },
     TIMINGS_HISTORY_ALIAS: {
         'table_name': "timings_history",
         'export_sql': "\\copy timings_history TO '{file_path}' WITH (FORMAT csv);",
-        'default_location': config['default_export_locations']['timings_history'],
-        'default_filename': config['default_export_filenames']['timings_history']
+        'default_location': cnfg.config['default_export_locations']['timings_history'],
+        'default_filename': cnfg.config['default_export_filenames']['timings_history']
     }
 }
 
 
-def _export_manager(table, file_selection=None) -> None:
+def export_manager(table, method=None) -> None:
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
-    TABLE_NAME = TABLE_CONFIG[table]['table_name']
-    
-    exists, info_message = vv.validate_db_status(table=TABLE_NAME)
+    exists, info_message = oo.get_db_exists_state(table=_get_table_name(table=table))
     if not exists:
-        ff.print_colored(text=f"EXPORT FROM '{TABLE_NAME}' UNSUCCESSFUL. {info_message}\n", color="YELLOW")
+        ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} {info_message}\n", color="YELLOW")
         return
     
-    if file_selection:
-        if file_selection == GUI:
-            gui_exec(table=table)
-        elif file_selection == DEFAULT:
-            default_exec(table=table)
+    if method:
+        if method == GUI:
+            _gui_exec(table=table)
+        elif method == DEFAULT:
+            _default_exec(table=table)
         else:
-            path_exec(table=table, file_path=file_selection)
+            _path_exec(table=table, file_path=method)
         return
 
     mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in FILE_SELECTION_OPTIONS))
-    file_selection_choice = ii.get_user_input()
+    method_choice = ii.get_user_input()
     
-    if not vv.validate_choice(choice=file_selection_choice, valid_options=FILE_SELECTION_OPTIONS, choice_type="FILE SELECTION"):
+    if not vv.validate_choice(choice=method_choice, valid_options=FILE_SELECTION_OPTIONS):
         return
     
-    if file_selection_choice == GUI:
-        gui_exec(table=table)
-    elif file_selection_choice == DEFAULT:
-        default_exec(table=table)
+    if method_choice == GUI:
+        _gui_exec(table=table)
+    elif method_choice == DEFAULT:
+        _default_exec(table=table)
     else:
-        file_path = ii.get_user_input(prompt="Enter the full path to the CSV file including the file name", lowercase=False)
-        path_exec(table=table, file_path=file_path)
+        file_path = ii.get_user_input(prompt="Enter the full path to the CSV file including the file name and .csv", lowercase=False)
+        _path_exec(table=table, file_path=file_path)
 
 
-def gui_exec(table) -> None:
+def _gui_exec(table) -> None:
     root = tk.Tk()
     root.withdraw()
     
@@ -86,46 +86,65 @@ def gui_exec(table) -> None:
     if not directory_path:
         return
     
-    CONFIG_FILENAME = TABLE_CONFIG[table]['default_filename']
+    DEFAULT_FILENAME = TABLE_CONFIG[table]['default_filename']
     
-    if not validate_csv_filename(filename=CONFIG_FILENAME):
-        ff.print_colored(text=f"INVALID DEFAULT FILENAME in config.json FOR TABLE '{TABLE_CONFIG[table]['table_name']}'.\n", color="YELLOW")
+    if not _validate_csv_filename(filename=DEFAULT_FILENAME):
+        ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} INVALID DEFAULT FILENAME in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
         return
     
-    FilePath = Path(directory_path) / CONFIG_FILENAME
+    FilePath = Path(directory_path) / DEFAULT_FILENAME
 
-    call_export(table=table, file_path=FilePath)
+    _call_export(table=table, file_path=FilePath)
 
-def default_exec(table) -> None:
-    is_valid, DirPath = validate_directory_path(path=TABLE_CONFIG[table]['default_location'])
-
-    TABLE_NAME = TABLE_CONFIG[table]['table_name']
+def _default_exec(table) -> None:
+    is_valid, DirPath = _validate_directory_path(path=TABLE_CONFIG[table]['default_location'])
     
     if not is_valid:
-        ff.print_colored(text=f"INVALID DEFAULT DIRECTORY PATH in config.json FOR TABLE '{TABLE_NAME}'.\n", color="YELLOW")
+        ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} INVALID DEFAULT DIRECTORY PATH in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
         return
     
-    is_valid, FileName = validate_csv_filename(filename=TABLE_CONFIG[table]['default_filename'])
+    is_valid, FileName = _validate_csv_filename(filename=TABLE_CONFIG[table]['default_filename'])
     
     if not is_valid:
-        ff.print_colored(text=f"INVALID DEFAULT FILENAME in config.json FOR TABLE '{TABLE_NAME}'.\n", color="YELLOW")
+        ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} INVALID DEFAULT FILENAME in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
         return
     
     FilePath = DirPath / FileName
     
-    call_export(table=table, file_path=FilePath)
+    _call_export(table=table, file_path=FilePath)
 
-def path_exec(table, file_path) -> None:
-    is_valid, FilePath = validate_file_path(path=file_path)
+def _path_exec(table, file_path) -> None:
+    is_valid, FilePath = _validate_file_path(path=file_path)
 
     if not is_valid:
-        ff.print_colored(text=f"INVALID FILE PATH.\n", color="YELLOW")
+        ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} INVALID FILE PATH.\n", color="YELLOW")
         return
 
-    call_export(table=table, file_path=FilePath)
+    _call_export(table=table, file_path=FilePath)
 
 
-def validate_directory_path(path) -> tuple[bool, Path | None]: 
+def _validate_file_path(path) -> tuple[bool, Path | None]:
+    if not path.strip():
+        return False, None
+
+    path = path.replace('"', '').replace("'", '')
+
+    FilePath = Path(path)
+    directory = FilePath.parent
+    filename = FilePath.name
+
+    is_dir_valid, DirPath = _validate_directory_path(path=str(directory))
+    if not is_dir_valid:
+        return False, None
+    
+    is_filename_valid, FileName = _validate_csv_filename(filename=filename)
+    if not is_filename_valid:
+        return False, None
+    
+    FilePath = DirPath / FileName
+    return True, FilePath
+
+def _validate_directory_path(path) -> tuple[bool, Path | None]: 
     if not path.strip():
         return False, None
     
@@ -138,7 +157,7 @@ def validate_directory_path(path) -> tuple[bool, Path | None]:
         return False, DirPath
     return True, DirPath
 
-def validate_csv_filename(filename) -> tuple[bool, str | None]:
+def _validate_csv_filename(filename) -> tuple[bool, str | None]:
     # At least one character as file name + .csv
     pattern = r'^.+\.csv$'
     filename = filename.strip()
@@ -148,29 +167,15 @@ def validate_csv_filename(filename) -> tuple[bool, str | None]:
         return len(name_part) > 0, filename
     return False, None
 
-def validate_file_path(path) -> tuple[bool, Path | None]:
-    if not path.strip():
-        return False, None
 
-    path = path.replace('"', '').replace("'", '')
-
-    FilePath = Path(path)
-    directory = FilePath.parent
-    filename = FilePath.name
-
-    is_dir_valid, DirPath = validate_directory_path(path=str(directory))
-    if not is_dir_valid:
-        return False, None
-    
-    is_filename_valid, FileName = validate_csv_filename(filename=filename)
-    if not is_filename_valid:
-        return False, None
-    
-    FilePath = DirPath / FileName
-    return True, FilePath
-
-
-def call_export(table, file_path) -> None:
+def _call_export(table, file_path) -> None:
     result = exe.execute_query(sql=TABLE_CONFIG[table]['export_sql'].format(file_path=file_path), header=False, capture=True)
 
-    ff.print_colored(text=f"EXPORT FROM '{TABLE_CONFIG[table]['table_name']}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")
+    ff.print_colored(text=f"EXPORT FROM '{_get_table_name(table=table)}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")
+
+
+def _get_unsuccessful_export_message(table) -> str:
+    return f"EXPORT FROM '{_get_table_name(table=table)}' UNSUCCESSFUL."
+
+def _get_table_name(table) -> str:
+    return TABLE_CONFIG[table]['table_name']

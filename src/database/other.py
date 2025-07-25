@@ -1,6 +1,9 @@
-import database.others.executor as exe
 import utils.formatter as ff
 
+import database.tools.executor as exe
+
+
+# PSQL
 def psql_exec():
     ff.print_colored(text="OPENING PSQL SHELL...\n", color="GREEN")
     exe.execute_query(sql=None)

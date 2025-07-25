@@ -1,12 +1,13 @@
+import config as cnfg
+
 import subprocess
-from config import config
 
 
-def execute_query(sql=None, pager=False, header=True, capture=False, text=True, check=True, postgres_db=False):    
+def execute_query(sql=None, pager=False, header=True, capture=False, text=True, check=True, postgres_db=False) -> subprocess.CompletedProcess:    
     command = [
         "psql",
-        "-U", config['db_connection']['user'],
-        "-d", config['db_connection']['database'] if not postgres_db else "postgres",
+        "-U", cnfg.config['db_connection']['user'],
+        "-d", cnfg.config['db_connection']['database'] if not postgres_db else "postgres",
     ]
 
     if not pager:
@@ -17,10 +18,6 @@ def execute_query(sql=None, pager=False, header=True, capture=False, text=True, 
     
     if sql:
         command.extend(["-c", sql])
-
-    # if sql is None:
-    #     sql = "SELECT 'No SQL provided' AS message"
-    # command.extend(["-c", sql])
 
     return subprocess.run(args=command, check=check, capture_output=capture, text=text)
 
