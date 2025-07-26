@@ -3,7 +3,6 @@ import src.bootstrap
 import utils.inputter as ii
 import utils.formatter as ff
 import utils.menu as mm
-import utils.other as oo
 
 import database.select as slct
 import database.create_refresh_drop as crd
@@ -11,48 +10,10 @@ import database.import_ as imprt
 import database.export as exprt
 import database.other as othr
 
+import services.restart as rstrt
+import services.end as end
+
 import traceback
-
-# # sys.exit(0)
-
-# import src.manager
-# import src.execs
-# from src.others import print_colored, error_info, upper_casing, Tracker
-# from src._config import config; ALL, MAIN, HISTORY = config["table_choice"]
-
-
-
-# # * Process input
-# def process_INPUT(user_input):
-#     segments = user_input.split()
-#     return segments[0], segments[1:], str(len(segments[1:]))  # command, arguments, arguments_count
-
-# # * Show HELP
-# def help(specific_command):
-#     if specific_command is None:
-#         separator = print_colored(text='|', color="CYAN", display=False)
-#         formatted_pairs = f" {separator} ".join(f"{value['emoji']} {command}" for command, value in actions.items())
-#         print(f"\n{separator} {formatted_pairs} {separator}\n")
-#         return
-    
-#     if specific_command not in actions.keys():
-#         return print_colored(text=f"❌ Command '{specific_command}' not recognized\n", color="RED", display=False)
-
-#     def colored_HELP(command, args):
-#         command_color = "RED"
-#         arg_color = "YELLOW"
-
-#         output = ""
-#         print("\nCalling options:")
-#         for arg in args:
-#             output += f"-> {command} {arg}\n"
-
-#         for text, color in [('[', arg_color), (']', arg_color), (command, command_color)]:
-#             output = output.replace(text, print_colored(text=text, color=color, display=False))
-#         return output
-    
-#     print(f"{colored_HELP(command=specific_command, args=actions[specific_command]['info'])}")
-
 
 # actions = {
 #     '.' : {
@@ -245,7 +206,7 @@ commands = {
     'restart': {
         'emoji': '🔄',
         'calls': {
-            0: lambda: oo.restart_exec()
+            0: lambda: rstrt.restart_exec()
         },
         'args': {
             0: ()
@@ -271,7 +232,7 @@ commands = {
     'end': {
         'emoji': '🛑',
         'calls': {
-            0: lambda: oo.end_exec()
+            0: lambda: end.end_exec()
         },
         'args': {
             0: ()

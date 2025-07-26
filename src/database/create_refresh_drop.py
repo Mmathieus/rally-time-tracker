@@ -128,8 +128,8 @@ def _refresh_table(table, keep_data) -> None:
         """
         exe.execute_query(sql=transaction, header=False, capture=True)
     else:
-        _drop_table(table=table, confirmation=False)
-        _create_table(table=table, confirmation=False)
+        _drop_table(table=table, print_confirmation=False)
+        _create_table(table=table, print_confirmation=False)
         data_status = "DATA LOST."
     
     ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {data_status}\n", color="GREEN")

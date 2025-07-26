@@ -2,44 +2,44 @@ import config as cnfg
 
 import database.tools.executor as exe
 
-import copy
+# import copy
 
 
-DB_STATE_TEMPLATE = {
-    'database': { 
-        'exists': None,
-        'size': None
-    },
-    'timings': {
-        'exists': None,
-        'size': None,
-        'data_size': None,
-        'records': None
-    },
-    'timings_history': {
-        'exists': None,
-        'size': None,
-        'data_size': None,
-        'records': None
-    }
-}
+# DB_STATE_TEMPLATE = {
+#     'database': { 
+#         'exists': None,
+#         'size': None
+#     },
+#     'timings': {
+#         'exists': None,
+#         'size': None,
+#         'data_size': None,
+#         'records': None
+#     },
+#     'timings_history': {
+#         'exists': None,
+#         'size': None,
+#         'data_size': None,
+#         'records': None
+#     }
+# }
 
 DB_NAME = cnfg.config['db_connection']['database']
 TABLES = ("timings", "timings_history")
 
 
-def get_current_db_state() -> dict:
-    db_state = copy.deepcopy(DB_STATE_TEMPLATE)
+def get_current_db_state() -> None:
+    # cnfg.db_state = copy.deepcopy(DB_STATE_TEMPLATE)
 
-    DATABASE = db_state['database']
-    TIMINGS = db_state['timings']
-    TIMINGS_HISTORY = db_state['timings_history']
+    DATABASE = cnfg.db_state['database']
+    TIMINGS = cnfg.db_state['timings']
+    TIMINGS_HISTORY = cnfg.db_state['timings_history']
 
     DATABASE['exists'] = _database_exists()
 
     # DATABASE not present -> nothing (else) we can do
     if not DATABASE['exists']:
-        return db_state
+        return
     
     DATABASE['size'] = _get_database_info()
 
@@ -54,8 +54,6 @@ def get_current_db_state() -> dict:
     # TIMINGS_HISTORY info only if EXISTS
     if TIMINGS_HISTORY['exists']:
         TIMINGS_HISTORY['size'], TIMINGS_HISTORY['data_size'], TIMINGS_HISTORY['records'] = _get_table_info(table="timings_history")
-
-    return db_state
 
 
 def _database_exists() -> bool:

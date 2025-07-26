@@ -136,11 +136,11 @@ def format_size(bytes_size):
     
     return f"{bytes_size:.2f} B"
 
-def print_dashboard(data=None, with_new_status_dict=True):
+def print_dashboard(data=None, with_new_db_state=True):
     data = cnfg.db_state
     
-    if with_new_status_dict:
-        data = stts.get_current_db_state()
+    if with_new_db_state:
+        stts.get_current_db_state()
 
     GREEN = '\033[92m'
     RED = '\033[91m'

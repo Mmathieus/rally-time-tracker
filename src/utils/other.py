@@ -1,25 +1,6 @@
 import config as cnfg
 
-import utils.formatter as ff
 
-import sys
-import subprocess
-from typing import NoReturn
-
-
-# PROGRAM RESTART
-def restart_exec() -> NoReturn:
-    ff.print_colored(text="RESTARTING PROGRAM...\n", color="GREEN")
-    subprocess.run(args=["python", "-u", "main.py"], check=True)
-    sys.exit(0)
-
-# PROGRAM END
-def end_exec():
-    ff.print_colored(text="Have a great rest of your day Sir", color="CYAN")
-    sys.exit(0)
-
-
-# GETTING DATABASE/TABLE STATE
 def get_db_exists_state(table=None, must_exists=True) -> tuple[bool, str | None]:
     # IF db/table must exists    -> then the problem is that it DOESN'T EXISTS.
     # IF db/table mustn't exists -> then the problem is that it EXISTS.
