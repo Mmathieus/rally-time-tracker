@@ -6,14 +6,13 @@ src_path = ROOT / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
+
 import config as cnfg
-
-import utils.menu as mm
-
-import database.tools.status as stts
+import database.tools.state as stt
+import services.dashboard as dshbrd
 
 
-stts.get_current_db_state()
+stt.capture_current_db_state()
 
 if cnfg.config['dashboard_on_startup']:
-    mm.print_dashboard(with_new_db_state=False)
+    dshbrd.render_dashboard(refresh_db_state=False)

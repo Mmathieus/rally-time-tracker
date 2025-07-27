@@ -8,10 +8,11 @@ import database.select as slct
 import database.create_refresh_drop as crd
 import database.import_ as imprt 
 import database.export as exprt
-import database.other as othr
+import database.tools.psql as psql
 
 import services.restart as rstrt
 import services.end as end
+import services.dashboard as dshbrd
 
 import traceback
 
@@ -146,7 +147,7 @@ commands = {
     'create' : {
         'emoji': '✳️',
         'calls': {
-            1: lambda W: crd.create_exec(target=W)
+            1: lambda T: crd.create_exec(target=T)
         },
         'args': {
             1: ("[table/db]",)
@@ -166,7 +167,7 @@ commands = {
     'drop' : {
         'emoji': '💣',
         'calls': {
-            1: lambda W : crd.drop_exec(target=W)
+            1: lambda T : crd.drop_exec(target=T)
         },
         'args': {
             1: ("[table/db]",)
@@ -176,7 +177,7 @@ commands = {
         'emoji': '📥',
         'calls': {
             1: lambda T: imprt.import_manager(table=T),
-            2: lambda T, FS: imprt.import_manager(table=T, method=FS)
+            2: lambda T, M: imprt.import_manager(table=T, method=M)
         },
         'args': {
             1: ("[table]",),
@@ -187,17 +188,17 @@ commands = {
         'emoji': '📄',
         'calls': {
             1: lambda T: exprt.export_manager(table=T),
-            2: lambda T, FS: exprt.export_manager(table=T, method=FS)
+            2: lambda T, M: exprt.export_manager(table=T, method=M)
         },
         'args': {
             1: ("[table]",),
             2: ("[table]", "[method]")
         }
     },
-    'status': {
+    'dash': {
         'emoji': '📊',
         'calls': {
-            0: lambda: mm.print_dashboard()
+            0: lambda: dshbrd.render_dashboard()
         },
         'args': {
             0: ()
@@ -215,7 +216,7 @@ commands = {
     'psql': {
         'emoji': '🐘',
         'calls': {
-            0: lambda: othr.psql_exec()
+            0: lambda: psql.psql_exec()
         },
         'args': {
             0: ()
@@ -240,10 +241,8 @@ commands = {
     }
 }
 commands['help']['calls'][0] = lambda: mm.display_main_menu(commands_dict=commands)
-commands['help']['calls'][1] = lambda CN: mm.display_command_arguments(command_name=CN, commands_dict=commands)
+commands['help']['calls'][1] = lambda C: mm.display_command_arguments(command=C, commands_dict=commands)
 
-import pprint
-from config import config
 
 ff.print_colored(text="Welcome back Sir\n", color="CYAN")
 

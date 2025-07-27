@@ -1,36 +1,12 @@
 import config as cnfg
-
 import database.tools.executor as exe
 
-# import copy
-
-
-# DB_STATE_TEMPLATE = {
-#     'database': { 
-#         'exists': None,
-#         'size': None
-#     },
-#     'timings': {
-#         'exists': None,
-#         'size': None,
-#         'data_size': None,
-#         'records': None
-#     },
-#     'timings_history': {
-#         'exists': None,
-#         'size': None,
-#         'data_size': None,
-#         'records': None
-#     }
-# }
 
 DB_NAME = cnfg.config['db_connection']['database']
 TABLES = ("timings", "timings_history")
 
 
-def get_current_db_state() -> None:
-    # cnfg.db_state = copy.deepcopy(DB_STATE_TEMPLATE)
-
+def capture_current_db_state() -> None:
     DATABASE = cnfg.db_state['database']
     TIMINGS = cnfg.db_state['timings']
     TIMINGS_HISTORY = cnfg.db_state['timings_history']
