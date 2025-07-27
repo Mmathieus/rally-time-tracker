@@ -1,3 +1,7 @@
+import src.utils.formatter as ff
+
+ff.print_colored(text="LOADING...\n", color="GREEN")
+
 from pathlib import Path
 import sys
 
@@ -10,7 +14,6 @@ if str(src_path) not in sys.path:
 import config as cnfg
 import database.tools.state as stt
 import services.dashboard as dshbrd
-
 
 stt.capture_current_db_state()
 

@@ -8,6 +8,7 @@ import database.select as slct
 import database.create_refresh_drop as crd
 import database.import_ as imprt 
 import database.export as exprt
+import database.history as hstr
 import database.tools.psql as psql
 
 import services.restart as rstrt
@@ -142,6 +143,17 @@ commands = {
             0: (),
             1: ("[search_term]",),
             2: ("[rally]", "[stage]") 
+        }
+    },
+    'history' : {
+        'emoji': '📜',
+        'calls': {
+            0: lambda: hstr.history_manger(),
+            1: lambda S: hstr.history_manger(stage=S)
+        },
+        'args': {
+            0: (),
+            1: ("[stage]",) 
         }
     },
     'create' : {
