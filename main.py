@@ -9,6 +9,7 @@ import database.create_refresh_drop as crd
 import database.import_ as imprt 
 import database.export as exprt
 import database.history as hstr
+import database.insert as insrt
 import database.tools.psql as psql
 
 import services.restart as rstrt
@@ -154,6 +155,17 @@ commands = {
         'args': {
             0: (),
             1: ("[stage]",) 
+        }
+    },
+    'insert' : {
+        'emoji': '🆕',
+        'calls': {
+            0: lambda: insrt.insert_manager(),
+            4: lambda R, S, C, T: insrt.insert_manager(rally=R, stage=S, car=C, time=T)
+        },
+        'args': {
+            0: (),
+            4: ("[rally] [stage] [car] [time]",) 
         }
     },
     'create' : {

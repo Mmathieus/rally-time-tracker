@@ -27,6 +27,11 @@
                 "lose": ["n", "no", "l", "lose"]
             }
         },
+        "insert": {
+            "default_car": "i20",
+            "default_car_code": "0",
+            "confirm_insert": true
+        },
         "import_export": {
             "file_selection_options": {
                 "GUI": "gui",

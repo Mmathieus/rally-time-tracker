@@ -5,7 +5,7 @@ import utils.other as oo
 import database.tools.executor as exe
 
 
-HISTORY_QUERY_ALL = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings_history ORDER BY rally, time ASC, stage;"
+HISTORY_QUERY_ALL = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings_history ORDER BY rally, stage, time DESC;"
 HISTORY_QUERY_SPECIFIC = """
     SELECT
         id rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time,
@@ -39,7 +39,7 @@ def _history_exec(stage) -> None:
         return
     
     stage = ff.upper_casing(term=stage)
-
+    
     query = HISTORY_QUERY_SPECIFIC.format(stage=stage)
     
     if stage in ('.', ''):
@@ -50,7 +50,7 @@ def _history_exec(stage) -> None:
 
 
 def _exists_timings_history() -> bool:
-    exists, info_message = oo.get_db_exists_state(table="timings_history")
+    exists, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
     if not exists:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return False

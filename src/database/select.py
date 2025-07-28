@@ -42,7 +42,7 @@ def select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) ->
 
 
 def _exists_timings() -> bool:
-    exists, info_message = oo.get_db_exists_state(table="timings")
+    exists, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
     if not exists:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return False
