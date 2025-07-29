@@ -50,8 +50,8 @@ def _history_exec(stage) -> None:
 
 
 def _exists_timings_history() -> bool:
-    exists, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
+    if not all_ok:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return False
     return True

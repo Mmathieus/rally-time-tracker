@@ -44,8 +44,8 @@ def export_manager(table, method=None) -> None:
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
-    exists, info_message = oo.get_db_exists_state(table=_get_table_name(table=table))
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table=_get_table_name(table=table))
+    if not all_ok:
         ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} {info_message}\n", color="YELLOW")
         return
     

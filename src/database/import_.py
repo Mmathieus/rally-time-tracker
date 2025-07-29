@@ -7,6 +7,7 @@ import utils.menu as mm
 import utils.other as oo
 
 import database.tools.executor as exe
+import database.tools.sequence as sqnc
 
 from pathlib import Path
 from tkinter import filedialog
@@ -42,8 +43,8 @@ def import_manager(table, method=None) -> None:
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
-    exists, info_message = oo.get_db_exists_state(table=_get_table_name(table=table))
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table=_get_table_name(table=table))
+    if not all_ok:
         ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} {info_message}\n", color="YELLOW")
         return
     
@@ -129,6 +130,8 @@ def _call_import(table, file_path) -> None:
         return
 
     ff.print_colored(text=f"IMPORT INTO '{_get_table_name(table=table)}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")
+
+    # sqnc.update_sequence(calling_from=_get_table_name(table=table))
 
 
 def _get_unsuccessful_import_message(table) -> str:

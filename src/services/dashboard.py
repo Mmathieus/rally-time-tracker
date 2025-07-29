@@ -6,10 +6,10 @@ import re
 ###- THANKS TO Claude Sonnet 4 FOR THIS -###
 
 # Global settings
-VERTICAL_SPACING = 9
-DB_BOX_WIDTH = 31
-TABLE_BOX_WIDTH = 31
-DASHBOARD_PADDING = 5
+VERTICAL_SPACING = cnfg.config['dashboard_vertical_spacing']
+DB_BOX_WIDTH = cnfg.config['dashboard_db_box_width']
+TABLE_BOX_WIDTH = cnfg.config['dashboard_table_box_width']
+DASHBOARD_PADDING = cnfg.config['dashboard_padding']
 
 
 def render_dashboard(
@@ -44,7 +44,7 @@ def render_dashboard(
     
     # DATABASE box
     db_info = cnfg.db_state['database']
-    db_name = "wrc9database"  # or from some configuration
+    db_name = cnfg.config['db_connection']['database']
     
     # Create database box content
     db_content = []

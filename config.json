@@ -1,11 +1,11 @@
 {
     "db_connection": {
         "user": "postgres",
-        "database": "wrc9database"
+        "database": "test123"
     },
     "table_references": {
-        "timings": "main",
-        "timings_history": "history"
+        "timings": "m",
+        "timings_history": "h"
     },
     "default_import_locations": {
         "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
@@ -35,10 +35,14 @@
         "import_export": {
             "file_selection_options": {
                 "GUI": "gui",
-                "Default": "default",
+                "Default": "d",
                 "Path": "path"
             }
         }
     },
-    "dashboard_on_startup": true
+    "dashboard_on_startup": true,
+    "dashboard_vertical_spacing": 9,
+    "dashboard_db_box_width": 31,
+    "dashboard_table_box_width": 31,
+    "dashboard_padding": 5
 }

@@ -28,10 +28,9 @@ INSERT_QUERY = """
     BEGIN;
         INSERT INTO timings(rally, stage, car, time) VALUES ('{rally}', '{stage}', '{car}', '{time}'::INTERVAL);
         INSERT INTO timings_history SELECT * FROM timings WHERE stage = '{stage}' ORDER BY id DESC LIMIT 1;
+        {delete_query}
     COMMIT;
 """
-
-DELETE_OLD_RECORD_QUERY = "DELETE FROM timings WHERE id = {id};"
 
 
 def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
@@ -50,8 +49,8 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
         ff.print_colored(text="INVALID TIME FORMAT. EXPECTED FORMAT: '(M)M:SS:mmm'. MAX - 59:59.999.\n", color="RED")
         return
     
-    exists, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
+    if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return
     
@@ -62,6 +61,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
 
     if record_exists:
         if improvement and record_id:
+            # 'else' statement from this 'if' is IMPROVED record. -> Letting it/him go.
             if re.fullmatch(r'[0:]*', improvement):
                 ff.print_colored(text=f"INSERT ABORTED. STAGE '{stage}' NOT IMPROVED. EXACTLY THE SAME TIME.", color="YELLOW")
                 print(f"+- {improvement}\n")
@@ -71,8 +71,8 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
             ff.print_colored(text=f"+ {improvement}\n", color="RED")
             return
         
-    exists, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
+    if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return
     
@@ -81,13 +81,14 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
     _insert_exec(rally=rally, stage=stage, car=car, time=time, gain=improvement, old_record_id=record_id)
 
 def _insert_exec(rally, stage, car, time, gain, old_record_id) -> None:
-    exe.execute_query(sql=INSERT_QUERY.format(rally=rally, stage=stage, car=car, time=time), header=False, capture=True)
+    delete_query = f"DELETE FROM timings WHERE id = {old_record_id};" if gain else ""
+
+    exe.execute_query(sql=INSERT_QUERY.format(rally=rally, stage=stage, car=car, time=time, delete_query=delete_query), header=False, capture=True)
 
     ff.print_colored(text="NEW RECORD INSERTED INTO 'timings' TABLE.", color="GREEN")
     ff.print_colored(text="NEW RECORD INSERTED INTO 'timings_history' TABLE.", color="GREEN")
 
-    if gain and old_record_id:
-        exe.execute_query(sql=DELETE_OLD_RECORD_QUERY.format(id=old_record_id), header=False, capture=True)
+    if gain:
         ff.print_colored(text="OLD RECORD DELETED FROM 'timings' TABLE.", color="GREEN")
         ff.print_colored(text=f"- {gain}", color="MAGENTA")
 
@@ -110,11 +111,11 @@ def _compare_with_existing_record(stage, time) -> tuple[bool, int | None, str | 
     if not data:
         return False, None, None
     
-    data = data.strip("()")
-    db_id, db_time = data.split(',')
+    is_improved = data.count('-')
 
-    is_improved = db_time.count('-')
-    db_time = db_time.replace('-', '')
+    data = re.sub(r'[-()]', '', data)
+
+    db_id, db_time = data.split(',')
     
     # STAGE exists but not improved
     if is_improved > 1:

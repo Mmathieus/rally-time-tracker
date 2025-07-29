@@ -7,6 +7,7 @@ import utils.menu as mm
 import utils.other as oo
 
 import database.tools.executor as exe
+import database.tools.sequence as sqnc
 
 
 CREATE_TIMINGS_TABLE_SQL = """
@@ -68,8 +69,8 @@ def create_exec(target) -> None:
 def _create_table(table, print_confirmation=True) -> None:
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
     
-    exists, info_message = oo.get_db_exists_state(table=TABLE_NAME, must_exists=False)
-    if exists:
+    all_ok, info_message = oo.get_db_exists_state(table=TABLE_NAME, must_exists=False)
+    if not all_ok:
         ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
@@ -79,8 +80,8 @@ def _create_table(table, print_confirmation=True) -> None:
     _set_exists_status(target=TABLE_NAME, new_value=True)
 
 def _create_database() -> None:
-    exists, info_message = oo.get_db_exists_state(must_exists=False)
-    if exists:
+    all_ok, info_message = oo.get_db_exists_state(must_exists=False)
+    if not all_ok:
         ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
@@ -97,8 +98,8 @@ def refresh_manager(table, keep_data=None) -> None:
     
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
     
-    exists, info_message = oo.get_db_exists_state(table=TABLE_NAME)
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table=TABLE_NAME)
+    if not all_ok:
         ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT REFRESHED. {info_message}\n", color="YELLOW")
         return
     
@@ -134,6 +135,8 @@ def _refresh_table(table, keep_data) -> None:
     
     ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {data_status}\n", color="GREEN")
 
+    # sqnc.update_sequence(calling_from=TABLE_NAME)
+
 
 def drop_exec(target) -> None:
     if target not in CREATE_AND_DROP_OPTIONS:
@@ -148,8 +151,8 @@ def _drop_table(table, print_confirmation=True) -> None:
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
     beginning = f"TABLE '{TABLE_NAME}'"
     
-    exists, info_message = oo.get_db_exists_state(table=TABLE_NAME)
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state(table=TABLE_NAME)
+    if not all_ok:
         ff.print_colored(text=f"{beginning} NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
@@ -159,8 +162,8 @@ def _drop_table(table, print_confirmation=True) -> None:
     _set_exists_status(target=TABLE_NAME, new_value=False)
 
 def _drop_database() -> None:
-    exists, info_message = oo.get_db_exists_state()
-    if not exists:
+    all_ok, info_message = oo.get_db_exists_state()
+    if not all_ok:
         ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
