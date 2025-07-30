@@ -12,7 +12,7 @@ TABLE_BOX_WIDTH = cnfg.config['dashboard_table_box_width']
 DASHBOARD_PADDING = cnfg.config['dashboard_padding']
 
 
-def render_dashboard(
+def display_dashboard(
         vertical_spacing=VERTICAL_SPACING,
         db_box_width=DB_BOX_WIDTH,
         table_box_width=TABLE_BOX_WIDTH,

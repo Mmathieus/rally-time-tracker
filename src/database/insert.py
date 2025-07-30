@@ -1,7 +1,7 @@
 import config as cnfg
 
-import utils.inputter as ii
 import utils.formatter as ff
+import utils.inputter as ii
 import utils.other as oo
 
 import database.select as slct

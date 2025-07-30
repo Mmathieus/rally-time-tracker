@@ -1,7 +1,7 @@
 {
     "db_connection": {
         "user": "postgres",
-        "database": "test123"
+        "database": "wrc9database"
     },
     "table_references": {
         "timings": "m",
@@ -41,8 +41,8 @@
         }
     },
     "dashboard_on_startup": true,
-    "dashboard_vertical_spacing": 9,
-    "dashboard_db_box_width": 31,
-    "dashboard_table_box_width": 31,
+    "dashboard_vertical_spacing": 5,
+    "dashboard_db_box_width": 25,
+    "dashboard_table_box_width": 29,
     "dashboard_padding": 5
 }

@@ -1,10 +1,10 @@
 import config as cnfg
 
-import utils.inputter as ii
 import utils.formatter as ff
-import utils.validator as vv
+import utils.inputter as ii
 import utils.menu as mm
 import utils.other as oo
+import utils.validator as vv
 
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
@@ -131,7 +131,7 @@ def _call_import(table, file_path) -> None:
 
     ff.print_colored(text=f"IMPORT INTO '{_get_table_name(table=table)}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")
 
-    # sqnc.update_sequence(calling_from=_get_table_name(table=table))
+    sqnc.update_sequence()
 
 
 def _get_unsuccessful_import_message(table) -> str:

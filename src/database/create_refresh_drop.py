@@ -1,10 +1,10 @@
 import config as cnfg
 
-import utils.inputter as ii
 import utils.formatter as ff
-import utils.validator as vv
+import utils.inputter as ii
 import utils.menu as mm
 import utils.other as oo
+import utils.validator as vv
 
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
@@ -135,7 +135,7 @@ def _refresh_table(table, keep_data) -> None:
     
     ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {data_status}\n", color="GREEN")
 
-    # sqnc.update_sequence(calling_from=TABLE_NAME)
+    sqnc.update_sequence()
 
 
 def drop_exec(target) -> None:

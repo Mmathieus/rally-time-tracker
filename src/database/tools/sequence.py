@@ -1,44 +1,55 @@
 import config as cnfg
-
-import utils.formatter as ff
-import utils.other as oo
-
 import database.tools.executor as exe
 
-SEQUENCE_QUERY = """
-    SELECT setval(
-        pg_get_serial_sequence('timings', 'id'), 
-        (SELECT GREATEST(
-            COALESCE(MAX(timings.id), 0),
-            COALESCE(MAX(timings_history.id), 0)
-        ) FROM timings, timings_history)
-    ) + 1 AS next_id;
-"""
 
-# Obidve tabuľky musia existovať
-# +
-# NE(musia) obsahovať záznamy (aspoň 1)
+SEQUENCE_QUERY = "SELECT setval(pg_get_serial_sequence('timings', 'id'), {value})"
 
-def _is_update_possible(from_table) -> bool:
-    if from_table == "timings":
-        if not cnfg.db_state['timings_history']['exists']:
-            return False
-        return True
+
+def update_sequence() -> None:
+    timings_id, timings_history_id = _tables_current_max_ids()
+
+    new_sequence_value = _determine_sequence_value(timings_value=timings_id, timings_history_value=timings_history_id)
+
+    if new_sequence_value:
+        exe.execute_query(sql=SEQUENCE_QUERY.format(value=new_sequence_value), header=False, capture=True)
+
+
+def _tables_current_max_ids() -> tuple[int, int | None]:
+    timings_id, timings_history_id = 0, None
+
+    # Timings
+    result = exe.execute_query(sql="SELECT MAX(id) FROM timings;", header=False, capture=True)
+    potential_id = result.stdout.strip()
+
+    if potential_id:
+        timings_id = potential_id
+
+    # Timings_history
+    if cnfg.db_state['timings_history']['exists']:
+        timings_history_id = 0
+        
+        result = exe.execute_query(sql="SELECT MAX(id) FROM timings_history;", header=False, capture=True)
+        potential_id = result.stdout.strip()
+
+        if potential_id:
+            timings_history_id = int(potential_id)
     
-    if from_table == "timings_history":
-        if not cnfg.db_state['timings']['exists']:
-            return False
-        return True
+    return int(timings_id), timings_history_id
 
+def _determine_sequence_value(timings_value, timings_history_value) -> int | None:
+    # Timings has NO RECORDS - Timings_history DOESN'T EXIST or has NO RECORD(S)
+    if not timings_value and not timings_history_value:
+        return None
 
-
-def update_sequence(calling_from, print_confirmation=False) -> None:
-    if not _is_update_possible(from_table=calling_from):
-        return
-
-    # exists, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
-    # if not exists:
-    #     ff.print_colored(text=f"ID SEQUENCE NOT REFRESHED. {info_message}\n", color="YELLOW")
-    #     return
+    # Timings has NO RECORDS - Timings_history has RECORD(S)
+    if not timings_value and timings_history_value:
+        return timings_history_value
     
-    exe.execute_query(sql=SEQUENCE_QUERY, capture=False) # not print_confirmation
+    ###########################
+
+    # Timings has RECORD(S) - Timings_history DOESN'T EXIST or has NO RECORD(S)
+    if timings_value and not timings_history_value:
+        return timings_value
+    
+    # Timings has RECORD(S) - Timings_history has RECORD(S)
+    return max(timings_value, timings_history_value)

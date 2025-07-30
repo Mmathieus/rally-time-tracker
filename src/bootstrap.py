@@ -18,4 +18,4 @@ import services.dashboard as dshbrd
 stt.capture_current_db_state()
 
 if cnfg.config['dashboard_on_startup']:
-    dshbrd.render_dashboard(refresh_db_state=False)
+    dshbrd.display_dashboard(refresh_db_state=False)

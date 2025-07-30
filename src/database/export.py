@@ -1,10 +1,10 @@
 import config as cnfg
 
-import utils.inputter as ii
 import utils.formatter as ff
-import utils.validator as vv
+import utils.inputter as ii
 import utils.menu as mm
 import utils.other as oo
+import utils.validator as vv
 
 import database.tools.executor as exe
 

@@ -1,8 +1,7 @@
 import src.bootstrap
 
-import utils.inputter as ii
 import utils.formatter as ff
-import utils.menu as mm
+import utils.inputter as ii
 
 import database.select as slct
 import database.create_refresh_drop as crd
@@ -12,9 +11,10 @@ import database.history as hstr
 import database.insert as insrt
 import database.tools.psql as psql
 
+import services.dashboard as dshbrd
+import services.help as hlp
 import services.restart as rstrt
 import services.end as end
-import services.dashboard as dshbrd
 
 import traceback
 
@@ -222,7 +222,7 @@ commands = {
     'dash': {
         'emoji': '📊',
         'calls': {
-            0: lambda: dshbrd.render_dashboard()
+            0: lambda: dshbrd.display_dashboard()
         },
         'args': {
             0: ()
@@ -231,7 +231,7 @@ commands = {
     'restart': {
         'emoji': '🔄',
         'calls': {
-            0: lambda: rstrt.restart_exec()
+            0: lambda: rstrt.restart_program()
         },
         'args': {
             0: ()
@@ -257,15 +257,15 @@ commands = {
     'end': {
         'emoji': '🛑',
         'calls': {
-            0: lambda: end.end_exec()
+            0: lambda: end.end_program()
         },
         'args': {
             0: ()
         }
     }
 }
-commands['help']['calls'][0] = lambda: mm.display_main_menu(commands_dict=commands)
-commands['help']['calls'][1] = lambda C: mm.display_command_arguments(command=C, commands_dict=commands)
+commands['help']['calls'][0] = lambda: hlp.display_commands_menu(commands_dict=commands)
+commands['help']['calls'][1] = lambda C: hlp.display_command_arguments_menu(command=C, commands_dict=commands)
 
 
 ff.print_colored(text="Welcome back Sir\n", color="CYAN")
