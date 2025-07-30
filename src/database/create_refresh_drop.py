@@ -9,6 +9,8 @@ import utils.validator as vv
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
 
+import re
+
 
 CREATE_TIMINGS_TABLE_SQL = """
     CREATE TABLE IF NOT EXISTS timings (
@@ -167,7 +169,16 @@ def _drop_database() -> None:
         ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
-    exe.execute_query(sql=f"DROP DATABASE IF EXISTS {DATABASE_NAME};", header=False, capture=True, postgres_db=True)
+    result = exe.execute_query(sql=f"DROP DATABASE IF EXISTS {DATABASE_NAME};", header=False, capture=True, postgres_db=True, check=False)
+
+    psql_message = result.stderr.strip()
+
+    if "is being accessed" in psql_message:
+        sessions_count = int(re.search(r'DETAIL:.*?(\d+)', psql_message).group(1))
+        session_text = "OTHER SESSION IS" if sessions_count == 1 else "OTHER SESSIONS ARE"
+
+        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED. {sessions_count} {session_text} USING THIS DATABASE.\n", color="YELLOW")
+        return
 
     ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' DROPPED.\n", color="GREEN")
     _set_exists_status(new_value=False)

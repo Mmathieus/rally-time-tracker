@@ -4,8 +4,8 @@
         "database": "wrc9database"
     },
     "table_references": {
-        "timings": "m",
-        "timings_history": "h"
+        "timings": "main",
+        "timings_history": "history"
     },
     "default_import_locations": {
         "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",

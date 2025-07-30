@@ -9,6 +9,7 @@ import database.import_ as imprt
 import database.export as exprt
 import database.history as hstr
 import database.insert as insrt
+import database.delete as dlt
 import database.tools.psql as psql
 
 import services.dashboard as dshbrd
@@ -217,6 +218,17 @@ commands = {
         'args': {
             1: ("[table]",),
             2: ("[table]", "[method]")
+        }
+    },
+    'delete': {
+        'emoji': '🗑️',
+        'calls': {
+            1: lambda T: dlt.delete_manager(table=T),
+            2: lambda T, ID: dlt.delete_manager(table=T, record_id=ID)
+        },
+        'args': {
+            1: ("[table]",),
+            2: ("[table]", "[record_id]")
         }
     },
     'dash': {
