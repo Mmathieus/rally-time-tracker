@@ -24,9 +24,9 @@ def display_commands_menu(commands_dict) -> None:
 def display_command_arguments_menu(command, commands_dict) -> None:
     ARGUMENTS_MENU_WIDTH = 45
     
-    # if command not in commands_dict:
-    #     ff.print_colored(text="COMMAND DOESN'T EXIST.\n", color="YELLOW")
-    #     return
+    if command not in commands_dict:
+        ff.print_colored(text=f"INVALID COMMAND '{command}'.\n", color="YELLOW")
+        return
     
     command_data = commands_dict[command]
     

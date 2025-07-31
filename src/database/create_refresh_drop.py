@@ -9,30 +9,9 @@ import utils.validator as vv
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
 
+from pathlib import Path
 import re
 
-
-CREATE_TIMINGS_TABLE_SQL = """
-    CREATE TABLE IF NOT EXISTS timings (
-        id SMALLSERIAL PRIMARY KEY,
-        rally VARCHAR(126) NOT NULL,
-        stage VARCHAR(126) NOT NULL,
-        car VARCHAR(126),
-        time INTERVAL NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
-"""
-
-CREATE_TIMINGS_HISTORY_TABLE_SQL = """
-    CREATE TABLE IF NOT EXISTS timings_history (
-        id SMALLINT PRIMARY KEY,
-        rally VARCHAR(126) NOT NULL,
-        stage VARCHAR(126) NOT NULL,
-        car VARCHAR(126),
-        time INTERVAL NOT NULL,
-        created_at TIMESTAMP NOT NULL
-    );
-"""
 
 DATABASE_NAME = cnfg.config['db_connection']['database']
 DATABASE_ALIAS = cnfg.config['operations']['create_refresh_drop']['database_reference']
@@ -48,19 +27,22 @@ DATA_OPTIONS = DATA_OPTIONS_KEEP + cnfg.config['operations']['create_refresh_dro
 TABLE_CONFIG = {
     TIMINGS_ALIAS: {
         'table_name': "timings",
-        'create_sql': CREATE_TIMINGS_TABLE_SQL,
+        'create_sql_file_path': Path(__file__).parent / "ddl" / "timings.sql",
         'drop_sql': "DROP TABLE IF EXISTS timings;"
     },
     TIMINGS_HISTORY_ALIAS: {
         'table_name': "timings_history",
-        'create_sql': CREATE_TIMINGS_HISTORY_TABLE_SQL,
+        'create_sql_file_path': Path(__file__).parent / "ddl" / "timings_history.sql",
         'drop_sql': "DROP TABLE IF EXISTS timings_history;"
     }
 }
 
+EVERYTHING_ALIAS = cnfg.config['everything_reference']
+ALL_TABLES_ALIAS = cnfg.config['operations']['create_refresh_drop']['all_tables_reference']
+
 
 def create_exec(target) -> None:
-    if target == '.':
+    if target == EVERYTHING_ALIAS:
         print()
         _create_database()
         _create_table(table=TIMINGS_ALIAS)
@@ -83,7 +65,7 @@ def _create_table(table, print_confirmation=True) -> None:
         ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
-    exe.execute_query(sql=TABLE_CONFIG[table]['create_sql'], header=False, capture=True)
+    exe.execute_query(file=TABLE_CONFIG[table]['create_sql_file_path'], header=False, capture=True)
     
     ff.print_colored(text=f"TABLE '{TABLE_NAME}' CREATED.\n", color="GREEN", really_print=print_confirmation)
     _set_exists_status(target=TABLE_NAME, new_value=True)
@@ -146,12 +128,12 @@ def _refresh_table(table, keep_data) -> None:
 
 
 def drop_exec(target) -> None:
-    if target == '.':
+    if target == EVERYTHING_ALIAS:
         print()
         _drop_database()
         return
     
-    if target == "tables":
+    if target == ALL_TABLES_ALIAS:
         print()
         _drop_table(TIMINGS_ALIAS)
         _drop_table(TIMINGS_HISTORY_ALIAS)

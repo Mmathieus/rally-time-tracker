@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS timings_history (
+    id SMALLINT PRIMARY KEY,
+    rally VARCHAR(126) NOT NULL,
+    stage VARCHAR(126) NOT NULL,
+    car VARCHAR(126),
+    time INTERVAL NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);

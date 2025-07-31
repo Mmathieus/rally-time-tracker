@@ -39,8 +39,33 @@ TABLE_CONFIG = {
     }
 }
 
+EVERYTHING_ALIAS = cnfg.config['everything_reference']
+
 
 def import_manager(table, method=None, override=None) -> None:
+    if table == EVERYTHING_ALIAS:
+        if not method:
+            LIMITED_METHOD_OPTIONS = (GUI, DEFAULT)
+            mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in LIMITED_METHOD_OPTIONS))
+            method = ii.get_user_input()
+
+            if not method:
+                return
+
+        if method == GUI:
+            print()
+            _gui_exec(table=TIMINGS_ALIAS, override=override)
+            _gui_exec(table=TIMINGS_HISTORY_ALIAS, override=override)
+            return
+        elif method == DEFAULT:
+            print()
+            _default_exec(table=TIMINGS_ALIAS, override=override)
+            _default_exec(table=TIMINGS_HISTORY_ALIAS, override=override)
+            return
+        else:
+            ff.print_colored(text=f"INVALID CHOICE '{method}'. ONLY '{GUI}' AND '{DEFAULT}' ALLOWED.\n", color="YELLOW")
+            return
+
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
@@ -125,12 +150,12 @@ def _validate_file_path(path) -> tuple[bool, Path | None]:
     return True, FilePath
 
 def _call_import(table, file_path, override) -> None:
-    doing_override = _should_override(override)
+    doing_override = _should_override(override=override)
     result = None
     override_message = ""
 
     if doing_override:
-        tmp_sql_file = _create_temp_sql_file(table, file_path)
+        tmp_sql_file = _create_temp_sql_file(table=table, csv_file_path=file_path)
         try:
             result = exe.execute_query(file=tmp_sql_file, header=False, capture=True)
             override_message = "PREVIOUS RECORDS OVERRIDDEN."
@@ -143,7 +168,7 @@ def _call_import(table, file_path, override) -> None:
     
     if result.stderr:
         if "duplicate key value" in result.stderr.strip():
-            duplicate_id = re.search(r'Key\s+\(\w+\)=\((\d+)\)', result.stderr).group(1)
+            duplicate_id = re.search(r'Key\s+\(\w+\)=\((\d+)\)', result.stderr.strip()).group(1)
             ff.print_colored(text=f"{_get_unsuccessful_import_message(table)} DUPLICATE ID '{duplicate_id}' FOUND.\n", color="YELLOW")
             return
         ff.print_colored(text="ERROR IN IMPORT.\n", color="RED")
@@ -151,7 +176,7 @@ def _call_import(table, file_path, override) -> None:
     
     sqnc.update_sequence()
 
-    imported_rows_count = re.search(r'COPY\s+(\d+)', (result.stdout).group(1))
+    imported_rows_count = re.search(r'COPY\s+(\d+)', (result.stdout.strip())).group(1)
     ff.print_colored(
         text=f"IMPORT INTO '{_get_table_name(table)}' SUCCESSFUL. {imported_rows_count} ROWS. {override_message}\n",
         color="GREEN"

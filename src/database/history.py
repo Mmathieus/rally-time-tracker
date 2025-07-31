@@ -1,3 +1,5 @@
+import config as cnfg
+
 import utils.formatter as ff
 import utils.inputter as ii
 import utils.other as oo
@@ -5,7 +7,12 @@ import utils.other as oo
 import database.tools.executor as exe
 
 
-HISTORY_QUERY_ALL = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings_history ORDER BY rally, stage, time DESC;"
+HISTORY_QUERY_ALL = """
+    SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at
+    FROM timings_history
+    ORDER BY rally, stage, time DESC;
+"""
+
 HISTORY_QUERY_SPECIFIC = """
     SELECT
         id rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time,
@@ -20,6 +27,8 @@ HISTORY_QUERY_SPECIFIC = """
         WHERE stage = '{stage}') AS subquery
     ORDER BY id;
 """
+
+EVERYTHING_ALIAS = cnfg.config['everything_reference']
 
 
 def history_manger(stage=None) -> None:
@@ -42,7 +51,8 @@ def _history_exec(stage) -> None:
     
     query = HISTORY_QUERY_SPECIFIC.format(stage=stage)
     
-    if stage in ('.', ''):
+    if stage == ff.upper_casing(term=EVERYTHING_ALIAS):
+        print("HERE\n")
         query = HISTORY_QUERY_ALL
     
     print()

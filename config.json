@@ -9,7 +9,7 @@
     },
     "default_import_locations": {
         "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
-        "timings_history": "C:/Users/matus/RallyDatabase/data/history.csv"
+        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
     },
     "default_export_locations": {
         "timings": "C:/Users/matus/Desktop",
@@ -25,7 +25,8 @@
             "data_options": {
                 "keep": ["y", "yes", "k", "keep"],
                 "lose": ["n", "no", "l", "lose"]
-            }
+            },
+            "all_tables_reference": "tables"
         },
         "insert": {
             "default_car": "i20",
@@ -42,6 +43,7 @@
             "override_data_options": ["y", "yes", "o", "over", "override", "1"] 
         }
     },
+    "everything_reference": ".",
     "dashboard_on_startup": true,
     "dashboard_vertical_spacing": 5,
     "dashboard_db_box_width": 25,

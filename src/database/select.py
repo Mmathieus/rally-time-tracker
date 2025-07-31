@@ -1,8 +1,13 @@
+import config as cnfg
+
 import utils.formatter as ff
 import utils.inputter as ii
 import utils.other as oo
 
 import database.tools.executor as exe
+
+
+EVERYTHING_ALIAS = cnfg.config['everything_reference']
 
 
 def select_manager(search_term=None) -> None:
@@ -25,7 +30,7 @@ def select_exec(rally=None, stage=None, fuzzy_search=False, search_term=None) ->
     SELECT_QUERY = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
     
     if fuzzy_search:
-        if search_term != '.':
+        if search_term != ff.upper_casing(term=EVERYTHING_ALIAS):
             SELECT_QUERY += f" WHERE rally = '{search_term}' OR stage = '{search_term}'"
     else:
         conditions = []

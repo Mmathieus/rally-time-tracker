@@ -38,6 +38,8 @@ TABLE_CONFIG = {
     }
 }
 
+# EVERYTHING_ALIAS = cnfg.config['everything_reference']
+
 
 def export_manager(table, method=None) -> None:
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
