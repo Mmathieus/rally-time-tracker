@@ -20,6 +20,12 @@
         "timings_history": "timings_history.csv"
     },
     "operations": {
+        "select": {
+            "time_ordering": {
+                "oldest": ["oldest", "earliest", "first"],
+                "newest": ["newest", "latest", "last", "recent"]
+            }
+        },
         "create_refresh_drop": {
             "database_reference": "db",
             "data_options": {

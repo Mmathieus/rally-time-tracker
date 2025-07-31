@@ -44,15 +44,11 @@ def history_manger(stage=None) -> None:
     _history_exec(stage=stage)
 
 def _history_exec(stage) -> None:
-    if not _exists_timings_history():
-        return
-    
     stage = ff.upper_casing(term=stage)
     
     query = HISTORY_QUERY_SPECIFIC.format(stage=stage)
     
     if stage == ff.upper_casing(term=EVERYTHING_ALIAS):
-        print("HERE\n")
         query = HISTORY_QUERY_ALL
     
     print()

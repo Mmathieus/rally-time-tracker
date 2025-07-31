@@ -22,7 +22,7 @@ def display_commands_menu(commands_dict) -> None:
     print()
 
 def display_command_arguments_menu(command, commands_dict) -> None:
-    ARGUMENTS_MENU_WIDTH = 45
+    ARGUMENTS_MENU_WIDTH = 50
     
     if command not in commands_dict:
         ff.print_colored(text=f"INVALID COMMAND '{command}'.\n", color="YELLOW")

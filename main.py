@@ -139,12 +139,14 @@ commands = {
         'calls': {
             0: lambda: slct.select_manager(),
             1: lambda ST: slct.select_manager(search_term=ST),
-            2: lambda R, S: slct.select_exec(rally=ff.upper_casing(term=R), stage=ff.upper_casing(term=S))
+            2: lambda ST, TO: slct.select_manager(search_term=ST, time_order=TO),
+            3: lambda ST, TO, OL: slct.select_manager(search_term=ST, time_order=TO, order_limit=OL)
         },
         'args': {
             0: (),
             1: ("[search_term]",),
-            2: ("[rally]", "[stage]") 
+            2: ("[search_term]", "[time_order]"),
+            3: ("[search_term]", "[time_order]", "[order_limit]")
         }
     },
     'history' : {
