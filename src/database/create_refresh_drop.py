@@ -60,6 +60,13 @@ TABLE_CONFIG = {
 
 
 def create_exec(target) -> None:
+    if target == '.':
+        print()
+        _create_database()
+        _create_table(table=TIMINGS_ALIAS)
+        _create_table(table=TIMINGS_HISTORY_ALIAS)
+        return
+    
     if target not in CREATE_AND_DROP_OPTIONS:
         return
     
@@ -87,7 +94,7 @@ def _create_database() -> None:
         ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
-    exe.execute_query(sql=f"CREATE DATABASE {DATABASE_NAME};", header=False, capture=True, check=False, postgres_db=True)
+    exe.execute_query(sql=f"CREATE DATABASE {DATABASE_NAME};", header=False, capture=True, postgres_db=True)
 
     ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' CREATED.\n", color="GREEN")
     _set_exists_status(target="database", new_value=True)
@@ -121,12 +128,10 @@ def _refresh_table(table, keep_data) -> None:
     if keep_data in DATA_OPTIONS_KEEP:
         transaction = f"""
             BEGIN;
-            
-            CREATE TEMP TABLE {TABLE_NAME}_backup AS SELECT * FROM {TABLE_NAME};
-            {TABLE_CONFIG[table]['drop_sql']}
-            {TABLE_CONFIG[table]['create_sql']}
-            INSERT INTO {TABLE_NAME} SELECT * FROM {TABLE_NAME}_backup;
-            
+                CREATE TEMP TABLE {TABLE_NAME}_backup AS SELECT * FROM {TABLE_NAME};
+                {TABLE_CONFIG[table]['drop_sql']}
+                {TABLE_CONFIG[table]['create_sql']}
+                INSERT INTO {TABLE_NAME} SELECT * FROM {TABLE_NAME}_backup;
             COMMIT;
         """
         exe.execute_query(sql=transaction, header=False, capture=True)
@@ -135,12 +140,23 @@ def _refresh_table(table, keep_data) -> None:
         _create_table(table=table, print_confirmation=False)
         data_status = "DATA LOST."
     
-    ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {data_status}\n", color="GREEN")
-
     sqnc.update_sequence()
+
+    ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {data_status}\n", color="GREEN")
 
 
 def drop_exec(target) -> None:
+    if target == '.':
+        print()
+        _drop_database()
+        return
+    
+    if target == "tables":
+        print()
+        _drop_table(TIMINGS_ALIAS)
+        _drop_table(TIMINGS_HISTORY_ALIAS)
+        return
+
     if target not in CREATE_AND_DROP_OPTIONS:
         return
     
@@ -151,16 +167,15 @@ def drop_exec(target) -> None:
 
 def _drop_table(table, print_confirmation=True) -> None:
     TABLE_NAME = TABLE_CONFIG[table]['table_name']
-    beginning = f"TABLE '{TABLE_NAME}'"
     
     all_ok, info_message = oo.get_db_exists_state(table=TABLE_NAME)
     if not all_ok:
-        ff.print_colored(text=f"{beginning} NOT DROPPED. {info_message}\n", color="YELLOW")
+        ff.print_colored(text=f"TABLE '{TABLE_NAME}' NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
     exe.execute_query(sql=TABLE_CONFIG[table]['drop_sql'], header=False, capture=True)
     
-    ff.print_colored(text=f"{beginning} DROPPED.\n", color="GREEN", really_print=print_confirmation)
+    ff.print_colored(text=f"TABLE '{TABLE_NAME}' DROPPED.\n", color="GREEN", really_print=print_confirmation)
     _set_exists_status(target=TABLE_NAME, new_value=False)
 
 def _drop_database() -> None:

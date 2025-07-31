@@ -12,7 +12,9 @@ import database.tools.sequence as sqnc
 from pathlib import Path
 from tkinter import filedialog
 import tkinter as tk
+import tempfile
 import re
+import os
 
 
 TIMINGS_ALIAS = cnfg.config['table_references']['timings']
@@ -38,7 +40,7 @@ TABLE_CONFIG = {
 }
 
 
-def import_manager(table, method=None) -> None:
+def import_manager(table, method=None, override=None) -> None:
     if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
@@ -50,11 +52,11 @@ def import_manager(table, method=None) -> None:
     
     if method:
         if method == GUI:
-            _gui_exec(table=table)
+            _gui_exec(table=table, override=override)
         elif method == DEFAULT:
-            _default_exec(table=table)
+            _default_exec(table=table, override=override)
         else:
-            _path_exec(table=table, file_path=method)
+            _path_exec(table=table, file_path=method, override=override)
         return
 
     mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
@@ -64,20 +66,20 @@ def import_manager(table, method=None) -> None:
         return
     
     if method_choice == GUI:
-        _gui_exec(table=table)
+        _gui_exec(table=table, override=override)
     elif method_choice == DEFAULT:
-        _default_exec(table=table)
+        _default_exec(table=table, override=override)
     else:
         file_path = ii.get_user_input(prompt="Enter the full path to the CSV file including the file name and .csv", lowercase=False)
-        _path_exec(table=table, file_path=file_path)
+        _path_exec(table=table, file_path=file_path, override=override)
 
 
-def _gui_exec(table) -> None:
+def _gui_exec(table, override) -> None:
     root = tk.Tk()
     root.withdraw()
     
     file_path = filedialog.askopenfilename(
-        title="Select a CSV file",
+        title=f"Select a CSV file for a table: {_get_table_name(table=table)}",
         filetypes=[("CSV files", "*.csv")]
     )
     
@@ -88,25 +90,25 @@ def _gui_exec(table) -> None:
     
     FilePath = Path(file_path)
 
-    _call_import(table=table, file_path=FilePath)
+    _call_import(table=table, file_path=FilePath, override=override)
 
-def _default_exec(table) -> None:
+def _default_exec(table, override) -> None:
     is_valid, FilePath = _validate_file_path(path=TABLE_CONFIG[table]['default_location'])
     
     if not is_valid:
         ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} INVALID DEFAULT FILE PATH in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
         return
     
-    _call_import(table=table, file_path=FilePath)
+    _call_import(table=table, file_path=FilePath, override=override)
 
-def _path_exec(table, file_path) -> None:
+def _path_exec(table, file_path, override) -> None:
     is_valid, FilePath = _validate_file_path(path=file_path)
 
     if not is_valid:
         ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} INVALID FILE PATH.\n", color="YELLOW")
         return
 
-    _call_import(table=table, file_path=FilePath)
+    _call_import(table=table, file_path=FilePath, override=override)
 
 
 def _validate_file_path(path) -> tuple[bool, Path | None]: 
@@ -122,16 +124,38 @@ def _validate_file_path(path) -> tuple[bool, Path | None]:
         return False, FilePath
     return True, FilePath
 
-def _call_import(table, file_path) -> None:    
-    result = exe.execute_query(sql=TABLE_CONFIG[table]['import_sql'].format(file_path=file_path), header=False, capture=True, check=False)
+def _call_import(table, file_path, override) -> None:
+    doing_override = _should_override(override)
+    result = None
+    override_message = ""
 
-    if result.stderr and "duplicate key value" in result.stderr.strip():
-        ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} DUPLICATE ID '{re.search(r'\((\d+)\)', result.stderr).group(1)}' FOUND.\n", color="YELLOW")
+    if doing_override:
+        tmp_sql_file = _create_temp_sql_file(table, file_path)
+        try:
+            result = exe.execute_query(file=tmp_sql_file, header=False, capture=True)
+            override_message = "PREVIOUS RECORDS OVERRIDDEN."
+        finally:
+            if os.path.exists(tmp_sql_file):
+                os.remove(tmp_sql_file)
+    else:
+        import_sql = TABLE_CONFIG[table]['import_sql'].format(file_path=file_path)
+        result = exe.execute_query(sql=import_sql, header=False, capture=True, check=False)
+    
+    if result.stderr:
+        if "duplicate key value" in result.stderr.strip():
+            duplicate_id = re.search(r'Key\s+\(\w+\)=\((\d+)\)', result.stderr).group(1)
+            ff.print_colored(text=f"{_get_unsuccessful_import_message(table)} DUPLICATE ID '{duplicate_id}' FOUND.\n", color="YELLOW")
+            return
+        ff.print_colored(text="ERROR IN IMPORT.\n", color="RED")
         return
-
-    ff.print_colored(text=f"IMPORT INTO '{_get_table_name(table=table)}' SUCCESSFUL. {result.stdout.split()[1]} ROWS.\n", color="GREEN")
-
+    
     sqnc.update_sequence()
+
+    imported_rows_count = re.search(r'COPY\s+(\d+)', (result.stdout).group(1))
+    ff.print_colored(
+        text=f"IMPORT INTO '{_get_table_name(table)}' SUCCESSFUL. {imported_rows_count} ROWS. {override_message}\n",
+        color="GREEN"
+    )
 
 
 def _get_unsuccessful_import_message(table) -> str:
@@ -139,3 +163,28 @@ def _get_unsuccessful_import_message(table) -> str:
 
 def _get_table_name(table) -> str:
     return TABLE_CONFIG[table]['table_name']
+
+
+def _create_temp_sql_file(table, csv_file_path) -> str:
+    TABLE_NAME = _get_table_name(table=table)
+    
+    sql_content = (
+        f"BEGIN;\n"
+        f"DELETE FROM {TABLE_NAME};\n"
+        f"\\copy {TABLE_NAME} FROM '{csv_file_path}' WITH (FORMAT csv);\n"
+        f"COMMIT;\n"
+    )
+
+    tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.sql', delete=False, encoding='utf-8')
+    tmp_file.write(sql_content)
+    tmp_file.close()
+    return tmp_file.name
+
+def _should_override(override) -> bool:
+    if override:
+        return vv.validate_choice(
+            choice=override,
+            valid_options=cnfg.config['operations']['import_export']['override_data_options'],
+            print_error=False
+        )
+    return cnfg.config['operations']['import_export']['override_data_on_import']

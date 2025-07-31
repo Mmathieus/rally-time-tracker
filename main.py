@@ -202,11 +202,13 @@ commands = {
         'emoji': '📥',
         'calls': {
             1: lambda T: imprt.import_manager(table=T),
-            2: lambda T, M: imprt.import_manager(table=T, method=M)
+            2: lambda T, M: imprt.import_manager(table=T, method=M),
+            3: lambda T, M, O: imprt.import_manager(table=T, method=M, override=O)
         },
         'args': {
             1: ("[table]",),
-            2: ("[table]", "[method]")
+            2: ("[table]", "[method]"),
+            3: ("[table]", "[method]", "[override_data]")
         }
     },
     'export': {

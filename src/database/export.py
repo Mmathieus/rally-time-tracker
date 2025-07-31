@@ -78,7 +78,7 @@ def _gui_exec(table) -> None:
     root.withdraw()
     
     directory_path = filedialog.askdirectory(
-        title="Select directory to save the file"
+        title=f"Select directory to save the file from a table: {_get_table_name(table=table)}"
     )
     
     root.destroy()

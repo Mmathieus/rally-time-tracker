@@ -2,7 +2,7 @@ import config as cnfg
 import subprocess
 
 
-def execute_query(sql=None, pager=False, header=True, capture=False, text=True, check=True, postgres_db=False) -> subprocess.CompletedProcess:    
+def execute_query(sql=None, file=None, pager=False, header=True, capture=False, text=True, check=True, postgres_db=False) -> subprocess.CompletedProcess:    
     command = [
         "psql",
         "-U", cnfg.config['db_connection']['user'],
@@ -17,6 +17,9 @@ def execute_query(sql=None, pager=False, header=True, capture=False, text=True, 
     
     if sql:
         command.extend(["-c", sql])
+    
+    if file:
+        command.extend(["-f", file])
 
     return subprocess.run(args=command, check=check, capture_output=capture, text=text)
 
@@ -26,6 +29,7 @@ def execute_query(sql=None, pager=False, header=True, capture=False, text=True, 
 # -P pager=off   : Disable pager (show all output at once)
 # -t             : tuples_only mode (no headers/footers)
 # -c "command"   : Execute command and exit
+# -f             : Execute file and exit
 
 # SUBPROCESS FLAGS REFERENCE:
 # check=True          : Raise CalledProcessError if command fails

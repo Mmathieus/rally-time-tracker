@@ -9,7 +9,7 @@
     },
     "default_import_locations": {
         "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
-        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
+        "timings_history": "C:/Users/matus/RallyDatabase/data/history.csv"
     },
     "default_export_locations": {
         "timings": "C:/Users/matus/Desktop",
@@ -37,7 +37,9 @@
                 "GUI": "gui",
                 "Default": "d",
                 "Path": "path"
-            }
+            },
+            "override_data_on_import": false,
+            "override_data_options": ["y", "yes", "o", "over", "override", "1"] 
         }
     },
     "dashboard_on_startup": true,
