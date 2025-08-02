@@ -12,12 +12,12 @@
         "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
     },
     "default_export_locations": {
-        "timings": "C:/Users/matus/Desktop",
-        "timings_history": "C:/Users/matus/Desktop"
+        "timings": "C:/Users/matus/Desktop/RallyDatabase/data",
+        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data"
     },
     "default_export_filenames": {
-        "timings": "timings.csv",
-        "timings_history": "timings_history.csv"
+        "timings": "main.csv",
+        "timings_history": "history.csv"
     },
     "operations": {
         "select": {
