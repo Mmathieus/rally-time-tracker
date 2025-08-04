@@ -3,17 +3,17 @@ import src.bootstrap
 import utils.formatter as ff
 import utils.inputter as ii
 
-import database.select as slct
 import database.create_refresh_drop as crd
+import database.insert as insrt
+import database.select as slct
+import database.history as hstr
 import database.import_ as imprt 
 import database.export as exprt
-import database.history as hstr
-import database.insert as insrt
 import database.delete as dlt
 import database.tools.psql as psql
 
-import services.dashboard as dshbrd
 import services.help as hlp
+import services.dashboard as dshbrd
 import services.restart as rstrt
 import services.end as end
 
@@ -134,6 +134,26 @@ import traceback
 
 
 commands = {
+    'create' : {
+        'emoji': '🔨',
+        'calls': {
+            1: lambda T: crd.create_exec(target=T)
+        },
+        'args': {
+            1: ("[table/db]",)
+        }
+    },
+    'insert' : {
+        'emoji': '✏️',
+        'calls': {
+            0: lambda: insrt.insert_manager(),
+            4: lambda R, S, C, T: insrt.insert_manager(rally=R, stage=S, car=C, time=T)
+        },
+        'args': {
+            0: (),
+            4: ("[rally] [stage] [car] [time]",) 
+        }
+    },
     'select' : {
         'emoji': '🔍',
         'calls': {
@@ -160,46 +180,6 @@ commands = {
             1: ("[stage]",) 
         }
     },
-    'insert' : {
-        'emoji': '🆕',
-        'calls': {
-            0: lambda: insrt.insert_manager(),
-            4: lambda R, S, C, T: insrt.insert_manager(rally=R, stage=S, car=C, time=T)
-        },
-        'args': {
-            0: (),
-            4: ("[rally] [stage] [car] [time]",) 
-        }
-    },
-    'create' : {
-        'emoji': '✳️',
-        'calls': {
-            1: lambda T: crd.create_exec(target=T)
-        },
-        'args': {
-            1: ("[table/db]",)
-        }
-    },
-    'refresh': {
-        'emoji': '🔄',
-        'calls': {
-            1: lambda T: crd.refresh_manager(table=T),
-            2: lambda T, KD: crd.refresh_manager(table=T, keep_data=KD)
-        },
-        'args': {
-            1: ("[table]",),
-            2: ("[table]", "[data_decision]")
-        }
-    },
-    'drop' : {
-        'emoji': '💣',
-        'calls': {
-            1: lambda T : crd.drop_exec(target=T)
-        },
-        'args': {
-            1: ("[table/db]",)
-        }
-    },
     'import': {
         'emoji': '📥',
         'calls': {
@@ -214,7 +194,7 @@ commands = {
         }
     },
     'export': {
-        'emoji': '📄',
+        'emoji': '💾',
         'calls': {
             1: lambda T: exprt.export_manager(table=T),
             2: lambda T, M: exprt.export_manager(table=T, method=M)
@@ -235,22 +215,15 @@ commands = {
             2: ("[table]", "[record_id]")
         }
     },
-    'dash': {
-        'emoji': '📊',
-        'calls': {
-            0: lambda: dshbrd.display_dashboard()
-        },
-        'args': {
-            0: ()
-        }
-    },
-    'restart': {
+    'refresh': {
         'emoji': '🔄',
         'calls': {
-            0: lambda: rstrt.restart_program()
+            1: lambda T: crd.refresh_manager(table=T),
+            2: lambda T, KD: crd.refresh_manager(table=T, keep_data=KD)
         },
         'args': {
-            0: ()
+            1: ("[table]",),
+            2: ("[table]", "[data_decision]")
         }
     },
     'psql': {
@@ -262,12 +235,40 @@ commands = {
             0: ()
         }
     },
+    'drop' : {
+        'emoji': '❌',
+        'calls': {
+            1: lambda T : crd.drop_exec(target=T)
+        },
+        'args': {
+            1: ("[table/db]",)
+        }
+    },
+    ### --- ###
     'help': {
-        'emoji': '❓',
+        'emoji': '💡',
         'calls': {},
         'args': {
             0: (),
             1: ("[command]",)
+        }
+    },
+    'dash': {
+        'emoji': '🖥️',
+        'calls': {
+            0: lambda: dshbrd.display_dashboard()
+        },
+        'args': {
+            0: ()
+        }
+    },
+    'restart': {
+        'emoji': '🔃',
+        'calls': {
+            0: lambda: rstrt.restart_program()
+        },
+        'args': {
+            0: ()
         }
     },
     'end': {

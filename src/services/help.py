@@ -1,25 +1,46 @@
 import utils.formatter as ff
 import utils.menu as mm
 
+###- THANKS TO Claude Sonnet 4 FOR THIS -###
+
+DATABASE_COMMANDS_COUNT = 10
+
 
 def display_commands_menu(commands_dict) -> None:
-    MAIN_MENU_WIDTH = 30
+    MAIN_MENU_WIDTH = 25
     
     if not commands_dict:
         ff.print_colored(text="NO COMMANDS AVAILABLE.\n", color="YELLOW")
         return
     
-    header_text = "COMMANDS"
+    commands_list = list(commands_dict.items())
     
-    items = []
-    for i, (command, data) in enumerate(commands_dict.items(), 1):
-        emoji = data.get('emoji', '•')
-        left_text = f"{emoji} {command}"
-        right_text = f"#{i:02d}"
-        items.append((left_text, right_text))
+    database_commands = commands_list[:DATABASE_COMMANDS_COUNT]
+    program_commands = commands_list[DATABASE_COMMANDS_COUNT:]
     
-    _draw_header_with_menu_options(header_text, items, MAIN_MENU_WIDTH)
-    print()
+    if database_commands:
+        header_text = "DATABASE COMMANDS"
+        items = []
+        for i, (command, data) in enumerate(database_commands, 1):
+            emoji = data.get('emoji', '•')
+            left_text = f"{emoji} {command}"
+            right_text = f"#{i:02d}"
+            items.append((left_text, right_text))
+        
+        _draw_header_with_menu_options(header_text, items, MAIN_MENU_WIDTH, True)
+        print()
+    
+    if program_commands:
+        header_text = "PROGRAM COMMANDS"
+        items = []
+        for i, (command, data) in enumerate(program_commands, DATABASE_COMMANDS_COUNT + 1):
+            emoji = data.get('emoji', '•')
+            left_text = f"{emoji} {command}"
+            right_text = f"#{i:02d}"
+            items.append((left_text, right_text))
+        
+        _draw_header_with_menu_options(header_text, items, MAIN_MENU_WIDTH, True)
+        print()
 
 def display_command_arguments_menu(command, commands_dict) -> None:
     ARGUMENTS_MENU_WIDTH = 50
