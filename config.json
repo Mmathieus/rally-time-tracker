@@ -3,22 +3,27 @@
         "user": "postgres",
         "database": "wrc9database"
     },
+    "all_databases": ["wrc9database", "wrc10database"],
+    
     "table_references": {
         "timings": "main",
         "timings_history": "history"
     },
+    "everything_reference": ".",
+    
     "default_import_locations": {
-        "timings": "C:/Users/matus/Desktop/RallyDatabase/data/main.csv",
-        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/history.csv"
+        "timings": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/main.csv",
+        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/history.csv"
     },
     "default_export_locations": {
-        "timings": "C:/Users/matus/Desktop/RallyDatabase/data",
-        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data"
+        "timings": "C:/Users/matus/Desktop/RallyDatabase/data/{database}",
+        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/{database}"
     },
     "default_export_filenames": {
         "timings": "main.csv",
         "timings_history": "history.csv"
     },
+    
     "operations": {
         "select": {
             "time_ordering": {
@@ -49,7 +54,7 @@
             "override_data_options": ["y", "yes", "o", "over", "override", "1"] 
         }
     },
-    "everything_reference": ".",
+    
     "dashboard_on_startup": true,
     "dashboard_vertical_spacing": 5,
     "dashboard_db_box_width": 25,
