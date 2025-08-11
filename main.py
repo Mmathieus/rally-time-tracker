@@ -11,6 +11,7 @@ import database.import_ as imprt
 import database.export as exprt
 import database.delete as dlt
 import database.tools.psql as psql
+import database.tools.switch as swtch
 
 import services.help as hlp
 import services.dashboard as dshbrd
@@ -242,6 +243,17 @@ commands = {
         },
         'args': {
             1: ("[table/db]",)
+        }
+    },
+    'switch' : {
+        'emoji': '⚡',
+        'calls': {
+            0: lambda: swtch.switch_manager(),
+            1: lambda D : swtch.switch_manager(database=D)
+        },
+        'args': {
+            0: (),
+            1: ("[database_name]",)
         }
     },
     ### --- ###

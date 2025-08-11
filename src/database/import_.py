@@ -17,7 +17,7 @@ import re
 import os
 
 
-DB_NAME = cnfg.config['db_connection']['database']
+# DB_NAME = cnfg.config['db_connection']['database']
 
 TIMINGS_ALIAS = cnfg.config['table_references']['timings']
 TIMINGS_HISTORY_ALIAS = cnfg.config['table_references']['timings_history']
@@ -120,7 +120,7 @@ def _gui_exec(table, override) -> None:
     _call_import(table=table, file_path=FilePath, override=override)
 
 def _default_exec(table, override) -> None:
-    is_valid, FilePath = _validate_file_path(path=TABLE_CONFIG[table]['default_location'].format(database=DB_NAME))
+    is_valid, FilePath = _validate_file_path(path=TABLE_CONFIG[table]['default_location'].format(database=_get_database_name()))
     
     if not is_valid:
         ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} INVALID DEFAULT FILE PATH in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
@@ -190,6 +190,9 @@ def _get_unsuccessful_import_message(table) -> str:
 
 def _get_table_name(table) -> str:
     return TABLE_CONFIG[table]['table_name']
+
+def _get_database_name() -> str:
+    return cnfg.config['db_connection']['database']
 
 
 def _create_temp_sql_file(table, csv_file_path) -> str:

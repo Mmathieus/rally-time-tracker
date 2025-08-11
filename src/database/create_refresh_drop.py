@@ -13,7 +13,7 @@ from pathlib import Path
 import re
 
 
-DATABASE_NAME = cnfg.config['db_connection']['database']
+# DATABASE_NAME = cnfg.config['db_connection']['database']
 DATABASE_ALIAS = cnfg.config['operations']['create_refresh_drop']['database_reference']
 
 TIMINGS_ALIAS = cnfg.config['table_references']['timings']
@@ -73,12 +73,12 @@ def _create_table(table, print_confirmation=True) -> None:
 def _create_database() -> None:
     all_ok, info_message = oo.get_db_exists_state(must_exists=False)
     if not all_ok:
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
+        ff.print_colored(text=f"DATABASE '{_get_database_name()}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
 
-    exe.execute_query(sql=f"CREATE DATABASE {DATABASE_NAME};", header=False, capture=True, postgres_db=True)
+    exe.execute_query(sql=f"CREATE DATABASE {_get_database_name()};", header=False, capture=True, postgres_db=True)
 
-    ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' CREATED.\n", color="GREEN")
+    ff.print_colored(text=f"DATABASE '{_get_database_name()}' CREATED.\n", color="GREEN")
     _set_exists_status(target="database", new_value=True)
 
 
@@ -163,10 +163,10 @@ def _drop_table(table, print_confirmation=True) -> None:
 def _drop_database() -> None:
     all_ok, info_message = oo.get_db_exists_state()
     if not all_ok:
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED. {info_message}\n", color="YELLOW")
+        ff.print_colored(text=f"DATABASE '{_get_database_name()}' NOT DROPPED. {info_message}\n", color="YELLOW")
         return
 
-    result = exe.execute_query(sql=f"DROP DATABASE IF EXISTS {DATABASE_NAME};", header=False, capture=True, postgres_db=True, check=False)
+    result = exe.execute_query(sql=f"DROP DATABASE IF EXISTS {_get_database_name()};", header=False, capture=True, postgres_db=True, check=False)
 
     psql_message = result.stderr.strip()
 
@@ -174,10 +174,10 @@ def _drop_database() -> None:
         sessions_count = int(re.search(r'DETAIL:.*?(\d+)', psql_message).group(1))
         session_text = "OTHER SESSION IS" if sessions_count == 1 else "OTHER SESSIONS ARE"
 
-        ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' NOT DROPPED. {sessions_count} {session_text} USING THIS DATABASE.\n", color="YELLOW")
+        ff.print_colored(text=f"DATABASE '{_get_database_name()}' NOT DROPPED. {sessions_count} {session_text} USING THIS DATABASE.\n", color="YELLOW")
         return
 
-    ff.print_colored(text=f"DATABASE '{DATABASE_NAME}' DROPPED.\n", color="GREEN")
+    ff.print_colored(text=f"DATABASE '{_get_database_name()}' DROPPED.\n", color="GREEN")
     _set_exists_status(new_value=False)
 
 
@@ -192,3 +192,6 @@ def _set_exists_status(target="all", new_value=None) -> None:
             cnfg.db_state[k]['exists'] = new_value
     else:
         ff.print_colored(text="PROGRAM INFO : PARAMETER 'target' IS WRONG TYPE.\n", color="RED")
+
+def _get_database_name() -> str:
+    return cnfg.config['db_connection']['database']

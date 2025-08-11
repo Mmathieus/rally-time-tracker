@@ -2,7 +2,7 @@ import config as cnfg
 import database.tools.executor as exe
 
 
-DB_NAME = cnfg.config['db_connection']['database']
+# DB_NAME = cnfg.config['db_connection']['database']
 TABLES = ("timings", "timings_history")
 
 
@@ -33,7 +33,7 @@ def capture_current_db_state() -> None:
 
 
 def _database_exists() -> bool:
-    result = exe.execute_query(sql=f"SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}');", header=False, capture=True, postgres_db=True)
+    result = exe.execute_query(sql=f"SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = '{cnfg.config['db_connection']['database']}');", header=False, capture=True, postgres_db=True)
     if result.stdout.strip() == 't':
         return True
     return False
@@ -45,7 +45,7 @@ def _table_exists(table) -> bool:
     return False
 
 def _get_database_info() -> int:
-    result = exe.execute_query(sql=f"SELECT pg_database_size('{DB_NAME}');", header=False, capture=True, postgres_db=True)
+    result = exe.execute_query(sql=f"SELECT pg_database_size('{cnfg.config['db_connection']['database']}');", header=False, capture=True, postgres_db=True)
     return int(result.stdout.strip())
 
 def _get_table_info(table) -> tuple[int, int, int]:

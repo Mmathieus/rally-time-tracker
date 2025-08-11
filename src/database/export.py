@@ -14,7 +14,7 @@ import tkinter as tk
 import re
 
 
-DB_NAME = cnfg.config['db_connection']['database']
+# DB_NAME = cnfg.config['db_connection']['database']
 
 TIMINGS_ALIAS = cnfg.config['table_references']['timings']
 TIMINGS_HISTORY_ALIAS = cnfg.config['table_references']['timings_history']
@@ -124,7 +124,7 @@ def _gui_exec(table) -> None:
     _call_export(table=table, file_path=FilePath)
 
 def _default_exec(table) -> None:
-    is_valid, DirPath = _validate_directory_path(path=TABLE_CONFIG[table]['default_location'].format(database=DB_NAME), table=table, simple_validation=False)
+    is_valid, DirPath = _validate_directory_path(path=TABLE_CONFIG[table]['default_location'].format(database=_get_database_name()), table=table, simple_validation=False)
     
     if not is_valid:
         ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} INVALID DEFAULT DIRECTORY PATH in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
@@ -189,7 +189,7 @@ def _validate_directory_path(path, table, simple_validation=True) -> tuple[bool,
         try:
             DirPath.mkdir(exist_ok=True)
         except Exception:
-            ff.print_colored(text=f"FAILED TO CREATE EXPORT DIRECTORY FOR DATABASE '{DB_NAME}' TABLE '{_get_table_name(table=table)}'", color="RED")
+            ff.print_colored(text=f"FAILED TO CREATE EXPORT DIRECTORY FOR DATABASE '{_get_database_name()}' TABLE '{_get_table_name(table=table)}'", color="RED")
             return False, DirPath
 
     if not DirPath.exists() or not DirPath.is_dir():
@@ -219,3 +219,6 @@ def _get_unsuccessful_export_message(table) -> str:
 
 def _get_table_name(table) -> str:
     return TABLE_CONFIG[table]['table_name']
+
+def _get_database_name() -> str:
+    return cnfg.config['db_connection']['database']

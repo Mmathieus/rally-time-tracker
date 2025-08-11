@@ -3,7 +3,7 @@ import utils.menu as mm
 
 ###- THANKS TO Claude Sonnet 4 FOR THIS -###
 
-DATABASE_COMMANDS_COUNT = 10
+DATABASE_COMMANDS_COUNT = 11
 
 
 def display_commands_menu(commands_dict) -> None:
