@@ -20,118 +20,17 @@ import services.end as end
 
 import traceback
 
-# actions = {
-#     '.' : {
-#         "emoji" : '🔍',
-#         "calls" : {
-#             '0' : lambda : manager.GET_manager(searching_term=None),
-#             '1' : lambda ST : manager.GET_manager(searching_term=ST),
-#             '2' : lambda R, S : execs.get(rally=upper_casing(R), stage=upper_casing(S))
-#         },
-#         "info" : ("", "[rally/stage]", "[rally] [stage]")
-#     },
-#     'add' : {
-#         "emoji" : '🆕',
-#         "calls" : {
-#             '0' : lambda : manager.INSERT_manager(data_obtained=False, record=[]),
-#             '4' : lambda R, S, C, T : manager.INSERT_manager(data_obtained=True, record=[R,S,C,T])
-#         },
-#         "info" : ("", "[rally] [stage] [car] [time]")
-#     },
-#     'history' : {
-#         "emoji" : '📜',
-#         "calls" : {
-#             '0' : lambda : manager.HISTORY_manager(),
-#             '1' : lambda S : execs.history(stage=upper_casing(S))
-#         },
-#         "info" : ("", "[stage]")
-#     },
-#     'access' : {
-#         "emoji" : '🗑️',
-#         "calls" : {
-#             '1' : lambda TC : manager.ACCESS_manager(table_choice=TC),
-#             '2' : lambda T, I : execs.access(table=T, ids=[int(I)], look=False)
-#         },
-#         "info" : (f"[{MAIN}/{HISTORY}]", f"[{MAIN}/{HISTORY}] [id]")
-#     },
-#     'help' : {
-#         "emoji" : '❓',
-#         "calls" : {
-#             '0' : lambda : help(specific_command=None),
-#             '1' : lambda C : help(specific_command=C)
-#         },
-#         "info" : ("", "[command]")
-#     },
-#     'rst' : {
-#         "emoji" : '🔄',
-#         "calls" : {
-#              '0' : lambda : execs.program_reset()
-#         },
-#         "info" : ("",)
-#     },
-#     'clear' : {
-#         "emoji" : '🧹',
-#         "calls" : {
-#             '1' : lambda TC : manager.CLEAR_manager(table_choice=TC)
-#         },
-#         "info" : (f"[{ALL}/{MAIN}/{HISTORY}]",)
-#     },
-#     'import' : {
-#         "emoji" : '📥',
-#         "calls" : {
-#             '1' : lambda T : manager.IMPORT_manager(table_choice=T, file_path=None),
-#             '2' : lambda FP, T : manager.IMPORT_manager(table_choice=T, file_path=FP)
-#         },
-#         "info" : (f"[{ALL}/{MAIN}/{HISTORY}]",
-#                   f"[filepath] [{ALL}/{MAIN}/{HISTORY}]")
-#     },
-#     'psql' : {
-#        "emoji" : '🐘',
-#        "calls" : {
-#             '0' : lambda : execs.psql()
-#         },
-#         "info" : ("",)
-#     },
-#     'save' : {
-#         "emoji" : '💾',
-#         "calls" : {
-#             '0' : lambda : (execs.csv_export(choice="all"), execs.csv_export(choice="backup")),
-#             '1' : lambda C : execs.csv_export(choice=C)
-#         },
-#         "info" : ("", f"[backup/{ALL}/{MAIN}/{HISTORY}]")
-#     },
-#     'sequence' : {
-#         "emoji" : '🆔',
-#         "calls" : {
-#             '0' : lambda : execs.update_sequence(show=True)
-#         },
-#         "info" : ("",)
-#     },
-#     'upload' : {
-#         "emoji" : '🐙',
-#         "calls" : {
-#             '0' : lambda : manager.UPLAOD_manager(choice=config["table_choice"][0], message=None),
-#             '1' : lambda C : manager.UPLAOD_manager(choice=C, message=None),
-#             '2' : lambda C, M : manager.UPLAOD_manager(choice=C, message=M)
-#         },
-#         "info" : ("", "[data/code]", "[data/code] [message]")
-#     },
-#     'show' : {
-#         "emoji" : '👀',
-#         "calls" : {
-#             '1' : lambda C : execs.show_files(choice=C.upper(), limit=10),
-#             '2' : lambda C, L : execs.show_files(choice=C.upper(), limit=L)
-#         },
-#         "info" : ("[M/H/MB/HB]", "[M/H/MB/HB] [limit]")
-#     },
-#     'end' : {
-#         "emoji" : '🛑',
-#         "calls" : {
-#             '0' : lambda : execs.end()
-#         },
-#         "info" : ("",)
-#     }
-# }
+
+def _parse_user_command(command_string) -> tuple[str, list[str], int]:
+    parts = command_string.strip().split()
+    
+    if not parts:
+        return "", [], 0
+    
+    command = parts[0]
+    args = parts[1:] if len(parts) > 1 else []
+    
+    return command, args, len(args)
 
 
 commands = {
@@ -173,8 +72,8 @@ commands = {
     'history' : {
         'emoji': '📜',
         'calls': {
-            0: lambda: hstr.history_manger(),
-            1: lambda S: hstr.history_manger(stage=S)
+            0: lambda: hstr.history_manager(),
+            1: lambda S: hstr.history_manager(stage=S)
         },
         'args': {
             0: (),
@@ -274,7 +173,7 @@ commands = {
             0: ()
         }
     },
-    'restart': {
+    'rst': {
         'emoji': '🔃',
         'calls': {
             0: lambda: rstrt.restart_program()
@@ -301,8 +200,8 @@ ff.print_colored(text="Welcome back Sir\n", color="CYAN")
 
 while True:
     try:
-        request = ii.get_user_input(prompt="", symbol='💬', with_colon=False)
-        command, args, args_count = ii.parse_command_input(input_string=request)
+        request = ii.get_user_input(symbol='💬', prompt="", with_colon=False)
+        command, args, args_count = _parse_user_command(command_string=request)
         
         if command in commands:
             if args_count in commands[command]['calls']:
@@ -310,5 +209,5 @@ while True:
                 func(*args)
     
     except Exception as e:
-        ff.print_colored(text=f"PROBLEM: {e}", color="RED")
-        ff.print_colored(text=f"Detaily:\n{traceback.format_exc()}\n", color="YELLOW")
+        ff.print_colored(text=f"PROBLEM: {e}", color="YELLOW")
+        ff.print_colored(text=f"Details:\n{traceback.format_exc()}\n", color="RED")

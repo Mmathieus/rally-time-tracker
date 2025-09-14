@@ -1,12 +1,13 @@
 import utils.formatter as ff
 
 
-def validate_choice(choice, valid_options, print_error=True) -> bool:
+def validate_choice(choice, valid_options, choice_name="") -> tuple[bool, str]:
+    choice_name_frmtd = f"{choice_name} " if choice_name else ""
+    
     if not choice:
-        return False
+        return False, f"EMPTY {choice_name_frmtd}CHOICE."
     
     if choice not in valid_options:
-        if print_error:
-            ff.print_colored(text=f"INVALID CHOICE '{choice}'.\n", color="RED")
-        return False
-    return True
+        return False, f"INVALID {choice_name_frmtd}CHOICE '{choice}'."
+    
+    return True, f"VALID {choice_name_frmtd}CHOICE."

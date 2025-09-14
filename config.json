@@ -33,11 +33,12 @@
         },
         "create_refresh_drop": {
             "database_reference": "db",
+            "all_tables_reference": "tables",
             "data_options": {
-                "keep": ["y", "yes", "k", "keep"],
-                "lose": ["n", "no", "l", "lose"]
+                "keep": ["y", "yes", "k", "keep", "1"],
+                "lose": ["n", "no", "l", "lose", "0"]
             },
-            "all_tables_reference": "tables"
+            "keep_data_on_refresh": true
         },
         "insert": {
             "default_car": "i20",
@@ -52,10 +53,14 @@
             },
             "override_data_on_import": false,
             "override_data_options": ["y", "yes", "o", "over", "override", "1"] 
+        },
+        "switch": {
+            "dashboard_after_switch": true
         }
     },
     
     "dashboard_on_startup": true,
+    
     "dashboard_vertical_spacing": 5,
     "dashboard_db_box_width": 25,
     "dashboard_table_box_width": 29,

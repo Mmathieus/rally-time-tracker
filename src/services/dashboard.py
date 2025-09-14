@@ -44,7 +44,7 @@ def display_dashboard(
     
     # DATABASE box
     db_info = cnfg.db_state['database']
-    db_name = cnfg.config['db_connection']['database']
+    db_name = cnfg.DB_NAME
     
     # Create database box content
     db_content = []

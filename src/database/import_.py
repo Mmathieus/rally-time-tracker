@@ -8,19 +8,14 @@ import utils.validator as vv
 
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
+import database.tools.tmp_file as tmpfl
 
 from pathlib import Path
 from tkinter import filedialog
 import tkinter as tk
-import tempfile
 import re
 import os
 
-
-# DB_NAME = cnfg.config['db_connection']['database']
-
-TIMINGS_ALIAS = cnfg.config['table_references']['timings']
-TIMINGS_HISTORY_ALIAS = cnfg.config['table_references']['timings_history']
 
 GUI = cnfg.config['operations']['import_export']['file_selection_options']['GUI']
 DEFAULT = cnfg.config['operations']['import_export']['file_selection_options']['Default']
@@ -29,23 +24,21 @@ PATH = cnfg.config['operations']['import_export']['file_selection_options']['Pat
 METHOD_OPTIONS = (GUI, DEFAULT, PATH)
 
 TABLE_CONFIG = {
-    TIMINGS_ALIAS: {
-        'table_name': "timings",
+    cnfg.TIMINGS_ALIAS: {
+        'table_name': cnfg.TIMINGS_REAL,
         'import_sql': "\\copy timings FROM '{file_path}' WITH (FORMAT csv);",
         'default_location': cnfg.config['default_import_locations']['timings']
     },
-    TIMINGS_HISTORY_ALIAS: {
-        'table_name': "timings_history",
+    cnfg.TIMINGS_HISTORY_ALIAS: {
+        'table_name': cnfg.TIMINGS_HISTORY_REAL,
         'import_sql': "\\copy timings_history FROM '{file_path}' WITH (FORMAT csv);",
         'default_location': cnfg.config['default_import_locations']['timings_history']
     }
 }
 
-EVERYTHING_ALIAS = cnfg.config['everything_reference']
-
 
 def import_manager(table, method=None, override=None) -> None:
-    if table == EVERYTHING_ALIAS:
+    if table == cnfg.EVERYTHING_ALIAS:
         if not method:
             LIMITED_METHOD_OPTIONS = (GUI, DEFAULT)
             mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in LIMITED_METHOD_OPTIONS))
@@ -56,19 +49,19 @@ def import_manager(table, method=None, override=None) -> None:
 
         if method == GUI:
             print()
-            _gui_exec(table=TIMINGS_ALIAS, override=override)
-            _gui_exec(table=TIMINGS_HISTORY_ALIAS, override=override)
+            _gui_exec(table=cnfg.TIMINGS_ALIAS, override=override)
+            _gui_exec(table=cnfg.TIMINGS_HISTORY_ALIAS, override=override)
             return
         elif method == DEFAULT:
             print()
-            _default_exec(table=TIMINGS_ALIAS, override=override)
-            _default_exec(table=TIMINGS_HISTORY_ALIAS, override=override)
+            _default_exec(table=cnfg.TIMINGS_ALIAS, override=override)
+            _default_exec(table=cnfg.TIMINGS_HISTORY_ALIAS, override=override)
             return
         else:
             ff.print_colored(text=f"INVALID CHOICE '{method}'. ONLY '{GUI}' AND '{DEFAULT}' ALLOWED.\n", color="YELLOW")
             return
 
-    if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
+    if table not in (cnfg.TIMINGS_ALIAS, cnfg.TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
@@ -89,7 +82,8 @@ def import_manager(table, method=None, override=None) -> None:
     mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
     method_choice = ii.get_user_input()
     
-    if not vv.validate_choice(choice=method_choice, valid_options=METHOD_OPTIONS):
+    validated, validation_message = vv.validate_choice(choice=method_choice, valid_options=METHOD_OPTIONS)
+    if not validated:
         return
     
     if method_choice == GUI:
@@ -120,7 +114,7 @@ def _gui_exec(table, override) -> None:
     _call_import(table=table, file_path=FilePath, override=override)
 
 def _default_exec(table, override) -> None:
-    is_valid, FilePath = _validate_file_path(path=TABLE_CONFIG[table]['default_location'].format(database=_get_database_name()))
+    is_valid, FilePath = _validate_file_path(path=TABLE_CONFIG[table]['default_location'].format(database=cnfg.DB_NAME))
     
     if not is_valid:
         ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} INVALID DEFAULT FILE PATH in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
@@ -157,13 +151,24 @@ def _call_import(table, file_path, override) -> None:
     override_message = ""
 
     if doing_override:
-        tmp_sql_file = _create_temp_sql_file(table=table, csv_file_path=file_path)
+        TABLE_NAME = _get_table_name(table=table)
+
+        transaction = f"""
+            BEGIN;
+                DELETE FROM {TABLE_NAME};
+                \\copy {TABLE_NAME} FROM '{file_path}' WITH (FORMAT csv);
+            COMMIT;
+        """
+
+        tmp_sql_file = tmpfl.create_tmp_sql_file(sql_content=transaction)
+
         try:
             result = exe.execute_query(file=tmp_sql_file, header=False, capture=True)
             override_message = "PREVIOUS RECORDS OVERRIDDEN."
         finally:
             if os.path.exists(tmp_sql_file):
                 os.remove(tmp_sql_file)
+    
     else:
         import_sql = TABLE_CONFIG[table]['import_sql'].format(file_path=file_path)
         result = exe.execute_query(sql=import_sql, header=False, capture=True, check=False)
@@ -191,30 +196,12 @@ def _get_unsuccessful_import_message(table) -> str:
 def _get_table_name(table) -> str:
     return TABLE_CONFIG[table]['table_name']
 
-def _get_database_name() -> str:
-    return cnfg.config['db_connection']['database']
-
-
-def _create_temp_sql_file(table, csv_file_path) -> str:
-    TABLE_NAME = _get_table_name(table=table)
-    
-    sql_content = (
-        f"BEGIN;\n"
-        f"DELETE FROM {TABLE_NAME};\n"
-        f"\\copy {TABLE_NAME} FROM '{csv_file_path}' WITH (FORMAT csv);\n"
-        f"COMMIT;\n"
-    )
-
-    tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.sql', delete=False, encoding='utf-8')
-    tmp_file.write(sql_content)
-    tmp_file.close()
-    return tmp_file.name
 
 def _should_override(override) -> bool:
     if override:
-        return vv.validate_choice(
-            choice=override,
-            valid_options=cnfg.config['operations']['import_export']['override_data_options'],
-            print_error=False
-        )
+        OVERRIDE_OPTIONS = cnfg.config['operations']['import_export']['override_data_options']
+
+        validated, validation_message = vv.validate_choice(choice=override, valid_options=OVERRIDE_OPTIONS)
+        return validated  
+
     return cnfg.config['operations']['import_export']['override_data_on_import']

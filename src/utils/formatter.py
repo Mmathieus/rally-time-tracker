@@ -1,4 +1,4 @@
-def upper_casing(term) -> str:
+def to_pascal_kebab_case(term) -> str:
     term = term.strip().lower()
     return '-'.join([word.capitalize() for word in term.split('-')])
 

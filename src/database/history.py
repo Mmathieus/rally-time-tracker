@@ -28,36 +28,24 @@ HISTORY_QUERY_SPECIFIC = """
     ORDER BY id;
 """
 
-EVERYTHING_ALIAS = cnfg.config['everything_reference']
 
-
-def history_manger(stage=None) -> None:
-    if not _exists_timings_history():
+def history_manager(stage=None) -> None:
+    # Check if DB/TABLE exists
+    all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
+    if not all_ok:
+        ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return
     
-    if stage:
-        _history_exec(stage=stage)
-        return
-    
-    stage = ii.get_user_input(prompt="STAGE")
+    if not stage:
+        stage = ii.get_user_input(prompt="STAGE")
 
-    _history_exec(stage=stage)
+    _history_exec(stage=ff.to_pascal_kebab_case(term=stage))
 
 def _history_exec(stage) -> None:
-    stage = ff.upper_casing(term=stage)
-    
     query = HISTORY_QUERY_SPECIFIC.format(stage=stage)
     
-    if stage == ff.upper_casing(term=EVERYTHING_ALIAS):
+    if stage == ff.to_pascal_kebab_case(term=cnfg.EVERYTHING_ALIAS):
         query = HISTORY_QUERY_ALL
     
     print()
     exe.execute_query(sql=query)
-
-
-def _exists_timings_history() -> bool:
-    all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
-    if not all_ok:
-        ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
-        return False
-    return True

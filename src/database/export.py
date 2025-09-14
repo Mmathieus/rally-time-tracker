@@ -14,11 +14,6 @@ import tkinter as tk
 import re
 
 
-# DB_NAME = cnfg.config['db_connection']['database']
-
-TIMINGS_ALIAS = cnfg.config['table_references']['timings']
-TIMINGS_HISTORY_ALIAS = cnfg.config['table_references']['timings_history']
-
 GUI = cnfg.config['operations']['import_export']['file_selection_options']['GUI']
 DEFAULT = cnfg.config['operations']['import_export']['file_selection_options']['Default']
 PATH = cnfg.config['operations']['import_export']['file_selection_options']['Path']
@@ -26,25 +21,23 @@ PATH = cnfg.config['operations']['import_export']['file_selection_options']['Pat
 FILE_SELECTION_OPTIONS = (GUI, DEFAULT, PATH)
 
 TABLE_CONFIG = {
-    TIMINGS_ALIAS: {
-        'table_name': "timings",
+    cnfg.TIMINGS_ALIAS: {
+        'table_name': cnfg.TIMINGS_REAL,
         'export_sql': "\\copy timings TO '{file_path}' WITH (FORMAT csv);",
         'default_location': cnfg.config['default_export_locations']['timings'],
         'default_filename': cnfg.config['default_export_filenames']['timings']
     },
-    TIMINGS_HISTORY_ALIAS: {
-        'table_name': "timings_history",
+    cnfg.TIMINGS_HISTORY_ALIAS: {
+        'table_name': cnfg.TIMINGS_HISTORY_REAL,
         'export_sql': "\\copy timings_history TO '{file_path}' WITH (FORMAT csv);",
         'default_location': cnfg.config['default_export_locations']['timings_history'],
         'default_filename': cnfg.config['default_export_filenames']['timings_history']
     }
 }
 
-EVERYTHING_ALIAS = cnfg.config['everything_reference']
-
 
 def export_manager(table, method=None) -> None:
-    if table == EVERYTHING_ALIAS:
+    if table == cnfg.EVERYTHING_ALIAS:
         if not method:
             LIMITED_METHOD_OPTIONS = (GUI, DEFAULT)
             mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in LIMITED_METHOD_OPTIONS))
@@ -55,19 +48,19 @@ def export_manager(table, method=None) -> None:
         
         if method == GUI:
             print()
-            _gui_exec(table=TIMINGS_ALIAS)
-            _gui_exec(table=TIMINGS_HISTORY_ALIAS)
+            _gui_exec(table=cnfg.TIMINGS_ALIAS)
+            _gui_exec(table=cnfg.TIMINGS_HISTORY_ALIAS)
             return
         elif method == DEFAULT:
             print()
-            _default_exec(table=TIMINGS_ALIAS)
-            _default_exec(table=TIMINGS_HISTORY_ALIAS)
+            _default_exec(table=cnfg.TIMINGS_ALIAS)
+            _default_exec(table=cnfg.TIMINGS_HISTORY_ALIAS)
             return
         else:
             ff.print_colored(text=f"INVALID CHOICE '{method}'. ONLY '{GUI}' AND '{DEFAULT}' ALLOWED.\n", color="YELLOW")
             return
 
-    if table not in (TIMINGS_ALIAS, TIMINGS_HISTORY_ALIAS):
+    if table not in (cnfg.TIMINGS_ALIAS, cnfg.TIMINGS_HISTORY_ALIAS):
         ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
         return
     
@@ -88,7 +81,8 @@ def export_manager(table, method=None) -> None:
     mm.display_menu(title="FILE SELECTION?", options=tuple(opt.capitalize() for opt in FILE_SELECTION_OPTIONS))
     method_choice = ii.get_user_input()
     
-    if not vv.validate_choice(choice=method_choice, valid_options=FILE_SELECTION_OPTIONS):
+    validated, validation_message = vv.validate_choice(choice=method_choice, valid_options=FILE_SELECTION_OPTIONS)
+    if not validated:
         return
     
     if method_choice == GUI:
@@ -124,7 +118,7 @@ def _gui_exec(table) -> None:
     _call_export(table=table, file_path=FilePath)
 
 def _default_exec(table) -> None:
-    is_valid, DirPath = _validate_directory_path(path=TABLE_CONFIG[table]['default_location'].format(database=_get_database_name()), table=table, simple_validation=False)
+    is_valid, DirPath = _validate_directory_path(path=TABLE_CONFIG[table]['default_location'].format(database=cnfg.DB_NAME), table=table, simple_validation=False)
     
     if not is_valid:
         ff.print_colored(text=f"{_get_unsuccessful_export_message(table=table)} INVALID DEFAULT DIRECTORY PATH in config.json FOR TABLE '{_get_table_name(table=table)}'.\n", color="YELLOW")
@@ -189,7 +183,7 @@ def _validate_directory_path(path, table, simple_validation=True) -> tuple[bool,
         try:
             DirPath.mkdir(exist_ok=True)
         except Exception:
-            ff.print_colored(text=f"FAILED TO CREATE EXPORT DIRECTORY FOR DATABASE '{_get_database_name()}' TABLE '{_get_table_name(table=table)}'", color="RED")
+            ff.print_colored(text=f"FAILED TO CREATE EXPORT DIRECTORY FOR DATABASE '{cnfg.DB_NAME}' TABLE '{_get_table_name(table=table)}'", color="RED")
             return False, DirPath
 
     if not DirPath.exists() or not DirPath.is_dir():
@@ -219,6 +213,3 @@ def _get_unsuccessful_export_message(table) -> str:
 
 def _get_table_name(table) -> str:
     return TABLE_CONFIG[table]['table_name']
-
-def _get_database_name() -> str:
-    return cnfg.config['db_connection']['database']
