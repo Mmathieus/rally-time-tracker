@@ -37,7 +37,9 @@ def history_manager(stage=None) -> None:
         return
     
     if not stage:
-        stage = ii.get_user_input(prompt="STAGE")
+        stage_options = cnfg.get_stages()
+
+        stage = ii.get_user_input(prompt="STAGE", autocomplete_options=stage_options)
 
     _history_exec(stage=ff.to_pascal_kebab_case(term=stage))
 

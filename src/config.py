@@ -43,3 +43,32 @@ EVERYTHING_ALIAS = config['everything_reference']
 def update_db_name_globally() -> None:
     global DB_NAME
     DB_NAME = config['db_connection']['database']
+
+
+WRC_DICT = {
+    "Monte-Carlo": ["Agnieres", "Luceram", "Col-De-Braus"],
+    "Sweden": ["Torsby", "Vargasen", "Karlstad"],
+    "Mexico": ["Media-Luna-R", "Ibarrilla", "Leon"],
+    "Argentina": ["El-Condor", "Cuchilla-Nevada"],
+    "Portugal": ["Fafe", "Viana-Do-Castelo", "Felgueiras", "Arganil", "Lousada"],
+    "Italy": ["Baranta", "Lerno", "Ittiri"],
+    "Kenya": ["Ngema", "Seyabei"],
+    "Finland": ["Ouninpohja", "Horkka", "Arvaja", "Pihlajakoski", "Harju"],
+    "New-Zealand": ["Te-Hutewai", "Batley", "Brooks", "Te-Akau-South"],
+    "Turkey": ["Datca", "Cicekli", "Marmaris"],
+    "Germany": ["Moselland", "Freisen", "Panzerplatte"],
+    "Wales": ["Hafren", "Great-Orme" "Brenig"],
+    "Japan": ["Okazaki", "Nagakute", "Shinshiro", "Shitara"]
+}
+
+def get_rallies():
+    return list(WRC_DICT.keys())
+
+def get_rally_stages(rally):
+    return WRC_DICT[rally]
+
+def get_stages():
+    all_stages = []
+    for stages in WRC_DICT.values():
+        all_stages.extend(stages)
+    return all_stages

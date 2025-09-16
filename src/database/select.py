@@ -27,10 +27,33 @@ def select_manager(search_term=None, time_order=None, order_limit=None) -> None:
         select_exec(search_term=ff.to_pascal_kebab_case(term=search_term), time_order=time_order, order_limit=order_limit)
         return
     
-    rally = ii.get_user_input(prompt="RALLY")
-    stage = ii.get_user_input(prompt="STAGE")
+    # Selecting RALLY
+    rally = ff.to_pascal_kebab_case(
+        term=ii.get_user_input(
+            prompt="RALLY",
+            autocomplete_options=list(cnfg.WRC_DICT.keys())
+        )
+    )
 
-    select_exec(rally=ff.to_pascal_kebab_case(term=rally), stage=ff.to_pascal_kebab_case(term=stage))
+    stage_options = []
+    # No RALLY typed -> Considering all STAGES
+    if not rally:
+        stage_options = cnfg.get_stages()
+    # STAGES for specific RALLY
+    else:
+        if rally in cnfg.WRC_DICT:
+            stage_options =  cnfg.get_rally_stages(rally=rally)
+        # else: -> RALLY typed but not recognized
+
+    # Selecting STAGE
+    stage = ff.to_pascal_kebab_case(
+        term=ii.get_user_input(
+            prompt="STAGE",
+            autocomplete_options=stage_options
+        )
+    )
+
+    select_exec(rally=rally, stage=stage)
 
 def select_exec(rally=None, stage=None, search_term=None, time_order=None, order_limit=None) -> None:
     SELECT_QUERY = "SELECT id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time, created_at FROM timings"
