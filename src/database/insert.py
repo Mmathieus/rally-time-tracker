@@ -35,16 +35,27 @@ INSERT_QUERY = """
 
 def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
     if not rally:
-        inputs = []
-        for prompt in ["RALLY", "STAGE", "CAR", "TIME"]:
-            value = ii.get_user_input(prompt=prompt)
-            if not value:
-                print()
-                return
-            inputs.append(value)
+        # RALLY
+        rally = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="RALLY", autocomplete_options=cnfg.get_rallies()))
+        if not rally:
+            print(); return
+        
+        # STAGE
+        stage = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=rally)))
+        if not stage:
+            print(); return
+        
+        # CAR
+        car = ii.get_user_input(prompt="CAR")
+        if not car:
+            print(); return
+        
+        #TIME
+        time = ii.get_user_input(prompt="TIME")
+        if not time:
+            print(); return
     
-        rally, stage, car, time = inputs
-    
+    # TIME validations
     if not _validate_time_format(time=time):
         print(
             f"{ff.colorize(text=f"INVALID TIME FORMAT.", color="RED")} "
@@ -52,13 +63,12 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
         )
         return
 
-    # Check if DB/TABLE exists
+    # Check if DB/TABLE exists (timings)
     all_ok, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return
     
-    rally, stage = map(ff.to_pascal_kebab_case, (rally, stage))
     # Replace last ':' for '.'
     time = re.sub(r':([^:]*)$', r'.\1', time)
 
@@ -79,7 +89,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
             )
             return
     
-    # Check if DB/TABLE exists
+    # Check if DB/TABLE exists (timings_history)
     all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")

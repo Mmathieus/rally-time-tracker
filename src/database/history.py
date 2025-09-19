@@ -30,7 +30,7 @@ HISTORY_QUERY_SPECIFIC = """
 
 
 def history_manager(stage=None) -> None:
-    # Check if DB/TABLE exists
+    # Check if DB/TABLE exists (timings_history)
     all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
@@ -38,7 +38,6 @@ def history_manager(stage=None) -> None:
     
     if not stage:
         stage_options = cnfg.get_stages()
-
         stage = ii.get_user_input(prompt="STAGE", autocomplete_options=stage_options)
 
     _history_exec(stage=ff.to_pascal_kebab_case(term=stage))

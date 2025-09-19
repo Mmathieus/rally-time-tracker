@@ -64,11 +64,17 @@ WRC_DICT = {
 def get_rallies():
     return list(WRC_DICT.keys())
 
-def get_rally_stages(rally):
-    return WRC_DICT[rally]
+def get_stages(rally=None) -> list[str]:
+    # All STAGES -> no RALLY typed
+    if not rally:
+        stage_options = []
+        for stages in WRC_DICT.values():
+            stage_options.extend(stages)
+        return stage_options
 
-def get_stages():
-    all_stages = []
-    for stages in WRC_DICT.values():
-        all_stages.extend(stages)
-    return all_stages
+    # STAGES for specific RALLY
+    if rally in WRC_DICT:
+        return WRC_DICT[rally]
+    
+    # RALLY typed but not recognized -> no corresponding STAGES
+    return []

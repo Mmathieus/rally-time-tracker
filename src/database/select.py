@@ -28,30 +28,11 @@ def select_manager(search_term=None, time_order=None, order_limit=None) -> None:
         return
     
     # Selecting RALLY
-    rally = ff.to_pascal_kebab_case(
-        term=ii.get_user_input(
-            prompt="RALLY",
-            autocomplete_options=list(cnfg.WRC_DICT.keys())
-        )
-    )
+    rally = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="RALLY", autocomplete_options=list(cnfg.WRC_DICT.keys())))
 
-    stage_options = []
-    # No RALLY typed -> Considering all STAGES
-    if not rally:
-        stage_options = cnfg.get_stages()
-    # STAGES for specific RALLY
-    else:
-        if rally in cnfg.WRC_DICT:
-            stage_options =  cnfg.get_rally_stages(rally=rally)
-        # else: -> RALLY typed but not recognized
-
+    stage_options = cnfg.get_stages(rally=rally)
     # Selecting STAGE
-    stage = ff.to_pascal_kebab_case(
-        term=ii.get_user_input(
-            prompt="STAGE",
-            autocomplete_options=stage_options
-        )
-    )
+    stage = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="STAGE", autocomplete_options=stage_options))
 
     select_exec(rally=rally, stage=stage)
 

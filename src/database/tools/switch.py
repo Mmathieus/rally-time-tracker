@@ -44,7 +44,7 @@ def switch_manager(database=None) -> None:
     ff.print_colored(text=f"SWITCH TO DATABASE '{database}' SUCCESSFUL.\n", color="GREEN")
 
     if cnfg.config['operations']['switch']['dashboard_after_switch']:
-        ff.print_colored(text="LOADING DASHBOARD...\n", color="GREEN")
+        # ff.print_colored(text="LOADING DASHBOARD...\n", color="GREEN")
         dshbrd.display_dashboard(refresh_db_state=False)
 
 
