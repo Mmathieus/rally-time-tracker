@@ -10,7 +10,7 @@ import database.tools.state as stt
 import services.dashboard as dshbrd
 
 
-ALL_DATABASES = cnfg.config['all_databases']
+ALL_DATABASES = cnfg.config['database']['available_databases']
 
 
 def switch_manager(database=None) -> None:
@@ -28,23 +28,29 @@ def switch_manager(database=None) -> None:
             mm.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES)
             database = ii.get_user_input()
 
+            if not database:
+                print()
+                return
+
     if database == CURRENT_DB:
         ff.print_colored(text=f"ALREADY ON '{CURRENT_DB}' DATABASE.\n", color="YELLOW")
         return
 
     validated, validation_message = vv.validate_choice(choice=database, valid_options=VALID_DATABASES)
     if not validated:
+        print(f"{ff.colorize(text=validation_message, color="RED")}\n")
         return
     
-    cnfg.config['db_connection']['database'] = database
+    ff.print_colored(text="SWITCHING...", color="GREEN")
+    
+    cnfg.config['database']['credentials']['database'] = database
     cnfg.update_db_name_globally()
 
     stt.capture_current_db_state()
 
     ff.print_colored(text=f"SWITCH TO DATABASE '{database}' SUCCESSFUL.\n", color="GREEN")
 
-    if cnfg.config['operations']['switch']['dashboard_after_switch']:
-        # ff.print_colored(text="LOADING DASHBOARD...\n", color="GREEN")
+    if cnfg.config['command']['switch']['dashboard_after_switch']:
         dshbrd.display_dashboard(refresh_db_state=False)
 
 
@@ -52,7 +58,7 @@ def _validate_db_names_in_config() -> bool:
     CURRENT_DB = cnfg.DB_NAME
 
     if CURRENT_DB not in ALL_DATABASES:
-        ff.print_colored(text=f"CURRENT DATABASE '{CURRENT_DB}' MISSING IN 'all_databases' LIST IN config.json.\n", color="YELLOW")
+        ff.print_colored(text=f"CURRENT DATABASE '{CURRENT_DB}' MISSING IN 'available_databases' LIST IN config.json.\n", color="YELLOW")
         return False
     return True
 

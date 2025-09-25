@@ -8,17 +8,17 @@ import utils.validator as vv
 import database.tools.executor as exe
 
 
-OLDEST_TIME_ORDERING_OPTIONS = cnfg.config['operations']['select']['time_ordering']['oldest']
-NEWEST_TIME_ORDERING_OPTIONS = cnfg.config['operations']['select']['time_ordering']['newest']
+RECORDS_FROM_OLDEST = cnfg.config['command']['select']['records_order']['from_oldest']
+RECORDS_FROM_NEWEST = cnfg.config['command']['select']['records_order']['from_newest']
 
-TIME_ORDERING_OPTIONS = OLDEST_TIME_ORDERING_OPTIONS + NEWEST_TIME_ORDERING_OPTIONS
+RECORDS_ORDER_OPTIONS = RECORDS_FROM_OLDEST + RECORDS_FROM_NEWEST
 
 DEFAULT_ORDER = " ORDER BY rally, time ASC, stage;"
 
 
 def select_manager(search_term=None, time_order=None, order_limit=None) -> None:
-    # Check if DB/TABLE exists
-    all_ok, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
+    # Check if DB/TABLE exists (primary)
+    all_ok, info_message = oo.get_db_exists_state(table=cnfg.PRIMARY_TB_NAME, include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return False
@@ -60,11 +60,7 @@ def select_exec(rally=None, stage=None, search_term=None, time_order=None, order
         else:
             # Check ORDERING term
             if time_order:
-                validated, validation_message = vv.validate_choice(
-                                                    choice=time_order.lower(),
-                                                    valid_options=TIME_ORDERING_OPTIONS,
-                                                    choice_name="ORDER"
-                                                )
+                validated, validation_message = vv.validate_choice(choice=time_order.lower(), valid_options=RECORDS_ORDER_OPTIONS, choice_name="ORDER")
                 if not validated:
                     ff.print_colored(text=f"{validation_message}\n", color="RED")
                     return
@@ -83,7 +79,7 @@ def select_exec(rally=None, stage=None, search_term=None, time_order=None, order
             if not time_order:
                 SELECT_QUERY += DEFAULT_ORDER
             else:
-                order_direction = "ASC" if time_order in OLDEST_TIME_ORDERING_OPTIONS else "DESC"
+                order_direction = "ASC" if time_order in RECORDS_FROM_OLDEST else "DESC"
                 SELECT_QUERY += f" ORDER BY created_at {order_direction} LIMIT {limit_value};"
 
     print()

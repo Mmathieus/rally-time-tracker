@@ -4,17 +4,24 @@ def to_pascal_kebab_case(term) -> str:
 
 
 colors = {
-    "RED" : "\033[31m",
-    "CYAN" : "\033[36m",
-    "GREEN" : "\033[32m",
-    "YELLOW" : "\033[33m",
-    "MAGENTA" : "\033[35m",
-    "RESET" : "\033[0m"
+    "RED": "\033[31m",
+    "CYAN": "\033[36m",
+    "BLUE": "\033[34m",
+    "GREEN": "\033[32m",
+    "YELLOW": "\033[33m",
+    "MAGENTA": "\033[35m",
+    "RESET": "\033[0m"
 }
 
-def print_colored(text, color, really_print=True) -> None:
+def print_colored(text, color=None, really_print=True) -> None:
     if really_print:
-        print(colorize(text, color))
+        if color:
+            print(colorize(text, color))
+        else:
+            print(text)
 
 def colorize(text, color) -> str:
-    return f"{colors[color]}{text}{colors['RESET']}"
+    if color:
+        return f"{colors[color]}{text}{colors['RESET']}"
+    else:
+        return text

@@ -9,19 +9,19 @@ with config_path.open('r', encoding='utf-8') as file:
     config = json.load(file)
 
 
-# For DB Dashboard
+# For DB Dashboard  ##! TO BE ...
 db_state = {
     'database': { 
         'exists': None,
         'size': None
     },
-    'timings': {
+    'timings': { ##
         'exists': None,
         'size': None,
         'data_size': None,
         'records': None
     },
-    'timings_history': {
+    'timings_history': { ##
         'exists': None,
         'size': None,
         'data_size': None,
@@ -30,36 +30,36 @@ db_state = {
 }
 
 
-DB_NAME = config['db_connection']['database']
-
-TIMINGS_REAL = "timings"
-TIMINGS_ALIAS = config['table_references']['timings']
-
-TIMINGS_HISTORY_REAL = "timings_history"
-TIMINGS_HISTORY_ALIAS = config['table_references']['timings_history']
-
-EVERYTHING_ALIAS = config['everything_reference']
+DB_NAME = config['database']['credentials']['database']
+DB_ALIAS = config['database']['reference']
 
 def update_db_name_globally() -> None:
     global DB_NAME
-    DB_NAME = config['db_connection']['database']
+    DB_NAME = config['database']['credentials']['database']
 
 
-WRC_DICT = {
-    "Monte-Carlo": ["Agnieres", "Luceram", "Col-De-Braus"],
-    "Sweden": ["Torsby", "Vargasen", "Karlstad"],
-    "Mexico": ["Media-Luna-R", "Ibarrilla", "Leon"],
-    "Argentina": ["El-Condor", "Cuchilla-Nevada"],
-    "Portugal": ["Fafe", "Viana-Do-Castelo", "Felgueiras", "Arganil", "Lousada"],
-    "Italy": ["Baranta", "Lerno", "Ittiri"],
-    "Kenya": ["Ngema", "Seyabei"],
-    "Finland": ["Ouninpohja", "Horkka", "Arvaja", "Pihlajakoski", "Harju"],
-    "New-Zealand": ["Te-Hutewai", "Batley", "Brooks", "Te-Akau-South"],
-    "Turkey": ["Datca", "Cicekli", "Marmaris"],
-    "Germany": ["Moselland", "Freisen", "Panzerplatte"],
-    "Wales": ["Hafren", "Great-Orme" "Brenig"],
-    "Japan": ["Okazaki", "Nagakute", "Shinshiro", "Shitara"]
+PRIMARY_TB_NAME = "timings"
+PRIMARY_TB_ALIAS = config['table']['reference']['primary_table']
+
+HISTORY_TB_NAME = "timings_history"
+HISTORY_TB_ALIAS = config['table']['reference']['history_table']
+
+TABLE_MAPPING = {
+    PRIMARY_TB_ALIAS: PRIMARY_TB_NAME,
+    HISTORY_TB_ALIAS: HISTORY_TB_NAME
 }
+
+def get_tb_name(table) -> str:
+    return TABLE_MAPPING[table]
+
+BOTH_TABLES = (PRIMARY_TB_ALIAS, HISTORY_TB_ALIAS)
+
+TABLES_ALIAS = config['table']['reference']['both_tables']
+
+EVERYTHING_ALIAS = config['other_reference']['everything']
+
+
+WRC_DICT = config['rally-stage']['rally']
 
 def get_rallies():
     return list(WRC_DICT.keys())
@@ -78,3 +78,6 @@ def get_stages(rally=None) -> list[str]:
     
     # RALLY typed but not recognized -> no corresponding STAGES
     return []
+
+
+COMMANDS_ALIAS = config['other_reference']['commands']

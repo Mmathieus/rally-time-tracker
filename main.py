@@ -1,14 +1,18 @@
 import src.bootstrap
 
+import config as cnfg
+
+import utils.error as rrr
 import utils.formatter as ff
 import utils.inputter as ii
 
-import database.create_refresh_drop as crd
+import database.create__drop as cd
 import database.insert as insrt
 import database.select as slct
 import database.history as hstr
 import database.import_ as imprt 
 import database.export as exprt
+import database.refresh as rfrsh
 import database.delete as dlt
 import database.tools.psql as psql
 import database.tools.switch as swtch
@@ -34,16 +38,16 @@ def _parse_user_command(command_string) -> tuple[str, list[str], int]:
 
 
 commands = {
-    'create' : {
+    cnfg.COMMANDS_ALIAS['create']: {
         'emoji': '🔨',
         'calls': {
-            1: lambda T: crd.create_exec(target=T)
+            1: lambda T: cd.create_exec(target=T)
         },
         'args': {
-            1: ("[table/db]",)
+            1: ("<table|database|all>",)
         }
     },
-    'insert' : {
+    cnfg.COMMANDS_ALIAS['insert']: {
         'emoji': '✏️',
         'calls': {
             0: lambda: insrt.insert_manager(),
@@ -51,10 +55,10 @@ commands = {
         },
         'args': {
             0: (),
-            4: ("[rally] [stage] [car] [time]",) 
+            4: ("<rally> <stage> <car> <time>",) 
         }
     },
-    'select' : {
+    cnfg.COMMANDS_ALIAS['select']: {
         'emoji': '🔍',
         'calls': {
             0: lambda: slct.select_manager(),
@@ -69,7 +73,7 @@ commands = {
             3: ("[search_term]", "[time_order]", "[order_limit]")
         }
     },
-    'history' : {
+    cnfg.COMMANDS_ALIAS['history']: {
         'emoji': '📜',
         'calls': {
             0: lambda: hstr.history_manager(),
@@ -80,7 +84,7 @@ commands = {
             1: ("[stage]",) 
         }
     },
-    'import': {
+    cnfg.COMMANDS_ALIAS['import']: {
         'emoji': '📥',
         'calls': {
             1: lambda T: imprt.import_manager(table=T),
@@ -88,45 +92,45 @@ commands = {
             3: lambda T, M, O: imprt.import_manager(table=T, method=M, override=O)
         },
         'args': {
-            1: ("[table]",),
-            2: ("[table]", "[method]"),
-            3: ("[table]", "[method]", "[override_data]")
+            1: ("<table|all>",),
+            2: ("<table|all>", "[method]"),
+            3: ("<table|all>", "[method]", "[override]")
         }
     },
-    'export': {
+    cnfg.COMMANDS_ALIAS['export']: {
         'emoji': '💾',
         'calls': {
             1: lambda T: exprt.export_manager(table=T),
             2: lambda T, M: exprt.export_manager(table=T, method=M)
         },
         'args': {
-            1: ("[table]",),
-            2: ("[table]", "[method]")
+            1: ("<table|all>",),
+            2: ("<table|all>", "[method]")
         }
     },
-    'delete': {
+    cnfg.COMMANDS_ALIAS['delete']: {
         'emoji': '🗑️',
         'calls': {
             1: lambda T: dlt.delete_manager(table=T),
             2: lambda T, ID: dlt.delete_manager(table=T, record_id=ID)
         },
         'args': {
-            1: ("[table]",),
-            2: ("[table]", "[record_id]")
+            1: ("<table>",),
+            2: ("<table>", "[id]")
         }
     },
-    'refresh': {
+    cnfg.COMMANDS_ALIAS['refresh']: {
         'emoji': '🔄',
         'calls': {
-            1: lambda T: crd.refresh_manager(table=T),
-            2: lambda T, KD: crd.refresh_manager(table=T, keep_data=KD)
+            1: lambda T: rfrsh.refresh_manager(table=T),
+            2: lambda T, KD: rfrsh.refresh_manager(table=T, keep_data=KD)
         },
         'args': {
-            1: ("[table]",),
-            2: ("[table]", "[data_decision]")
+            1: ("<table>",),
+            2: ("<table>", "[preserve]")
         }
     },
-    'psql': {
+    cnfg.COMMANDS_ALIAS['psql']: {
         'emoji': '🐘',
         'calls': {
             0: lambda: psql.psql_exec()
@@ -135,16 +139,16 @@ commands = {
             0: ()
         }
     },
-    'drop' : {
+    cnfg.COMMANDS_ALIAS['drop']: {
         'emoji': '❌',
         'calls': {
-            1: lambda T : crd.drop_exec(target=T)
+            1: lambda T : cd.drop_exec(target=T)
         },
         'args': {
-            1: ("[table/db]",)
+            1: ("<table|database>",)
         }
     },
-    'switch' : {
+    cnfg.COMMANDS_ALIAS['switch']: {
         'emoji': '⚡',
         'calls': {
             0: lambda: swtch.switch_manager(),
@@ -152,11 +156,11 @@ commands = {
         },
         'args': {
             0: (),
-            1: ("[database_name]",)
+            1: ("[database]",)
         }
     },
     ### --- ###
-    'help': {
+    cnfg.COMMANDS_ALIAS['help']: {
         'emoji': '💡',
         'calls': {},
         'args': {
@@ -164,7 +168,7 @@ commands = {
             1: ("[command]",)
         }
     },
-    'dash': {
+    cnfg.COMMANDS_ALIAS['dashboard']: {
         'emoji': '🖥️',
         'calls': {
             0: lambda: dshbrd.display_dashboard()
@@ -173,7 +177,7 @@ commands = {
             0: ()
         }
     },
-    'rst': {
+    cnfg.COMMANDS_ALIAS['restart']: {
         'emoji': '🔃',
         'calls': {
             0: lambda: rstrt.restart_program()
@@ -182,7 +186,7 @@ commands = {
             0: ()
         }
     },
-    'end': {
+    cnfg.COMMANDS_ALIAS['end']: {
         'emoji': '🛑',
         'calls': {
             0: lambda: end.end_program()
@@ -209,5 +213,4 @@ while True:
                 func(*args)
     
     except Exception as e:
-        ff.print_colored(text=f"PROBLEM: {e}", color="YELLOW")
-        ff.print_colored(text=f"Details:\n{traceback.format_exc()}\n", color="RED")
+       rrr.print_detailed_error(exception=e)

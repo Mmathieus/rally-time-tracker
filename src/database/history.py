@@ -30,8 +30,8 @@ HISTORY_QUERY_SPECIFIC = """
 
 
 def history_manager(stage=None) -> None:
-    # Check if DB/TABLE exists (timings_history)
-    all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
+    # Check if DB/TABLE exists (history)
+    all_ok, info_message = oo.get_db_exists_state(table=cnfg.HISTORY_TB_NAME, include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
         return

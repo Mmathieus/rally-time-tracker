@@ -17,14 +17,14 @@ def update_sequence() -> None:
 def _tables_current_max_ids() -> tuple[int, int | None]:
     timings_id, timings_history_id = 0, None
 
-    # Timings
+    # Primary
     result = exe.execute_query(sql="SELECT MAX(id) FROM timings;", header=False, capture=True)
     potential_id = result.stdout.strip()
 
     if potential_id:
         timings_id = potential_id
 
-    # Timings_history
+    # History
     if cnfg.db_state['timings_history']['exists']:
         timings_history_id = 0
         

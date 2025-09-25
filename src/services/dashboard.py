@@ -3,14 +3,14 @@ import utils.menu as mm
 import database.tools.state as stt
 import re
 
+
+VERTICAL_SPACING = cnfg.config['ui']['dashboard']['vertical_spacing']
+DB_BOX_WIDTH = cnfg.config['ui']['dashboard']['db_box_width']
+TABLE_BOX_WIDTH = cnfg.config['ui']['dashboard']['table_box_width']
+DASHBOARD_PADDING = cnfg.config['ui']['dashboard']['padding']
+
+
 ###- THANKS TO Claude Sonnet 4 FOR THIS -###
-
-# Global settings
-VERTICAL_SPACING = cnfg.config['dashboard_vertical_spacing']
-DB_BOX_WIDTH = cnfg.config['dashboard_db_box_width']
-TABLE_BOX_WIDTH = cnfg.config['dashboard_table_box_width']
-DASHBOARD_PADDING = cnfg.config['dashboard_padding']
-
 
 def display_dashboard(
         vertical_spacing=VERTICAL_SPACING,
@@ -183,8 +183,8 @@ def _create_table_boxes(dashboard_width, dashboard_padding, dashboard_content_wi
     
     # Create content for both tables
     db_exists = cnfg.db_state['database']['exists']
-    left_content = _create_table_content(cnfg.db_state['timings'], 'timings', db_exists)
-    right_content = _create_table_content(cnfg.db_state['timings_history'], 'timings_history', db_exists)
+    left_content = _create_table_content(cnfg.db_state['timings'], cnfg.PRIMARY_TB_NAME, db_exists)
+    right_content = _create_table_content(cnfg.db_state['timings_history'], cnfg.HISTORY_TB_NAME, db_exists)
     
     # Create individual table boxes
     left_box = _create_single_table_box(left_content, table_width)

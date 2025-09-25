@@ -1,40 +1,51 @@
 {
-    "db_connection": {
-        "user": "postgres",
-        "database": "wrc9database"
+    "database": {
+        "credentials": {
+            "user": "postgres",
+            "database": "wrc9database"
+        },
+        "available_databases": ["wrc9database", "wrc10database"],
+        "reference": "db"
     },
-    "all_databases": ["wrc9database", "wrc10database"],
-    
-    "table_references": {
-        "timings": "main",
-        "timings_history": "history"
+
+    "table": {
+        "reference": {
+            "primary_table": "main",
+            "history_table": "history",
+            "both_tables": "tables"
+        }
     },
-    "everything_reference": ".",
-    
-    "default_import_locations": {
-        "timings": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/main.csv",
-        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/history.csv"
+
+    "other_reference": {
+        "everything": ".",
+        "commands": {
+            "create": "create",
+            "insert": "insert",
+            "select": "select",
+            "history": "history",
+            "import": "import",
+            "export": "export",
+            "delete": "delete",
+            "refresh": "refresh",
+            "psql": "psql",
+            "drop": "drop",
+            "switch": "switch",
+            "help": "help",
+            "dashboard": "dash",
+            "restart": "rst",
+            "end": "end"
+        }
     },
-    "default_export_locations": {
-        "timings": "C:/Users/matus/Desktop/RallyDatabase/data/{database}",
-        "timings_history": "C:/Users/matus/Desktop/RallyDatabase/data/{database}"
-    },
-    "default_export_filenames": {
-        "timings": "main.csv",
-        "timings_history": "history.csv"
-    },
-    
-    "operations": {
+
+    "command": {
         "select": {
-            "time_ordering": {
-                "oldest": ["oldest", "earliest", "first"],
-                "newest": ["newest", "latest", "last", "recent"]
+            "records_order": {
+                "from_oldest": ["oldest", "earliest", "first"],
+                "from_newest": ["newest", "latest", "last", "recent"]
             }
         },
-        "create_refresh_drop": {
-            "database_reference": "db",
-            "all_tables_reference": "tables",
-            "data_options": {
+        "refresh": {
+            "data_handling": {
                 "keep": ["y", "yes", "k", "keep", "1"],
                 "lose": ["n", "no", "l", "lose", "0"]
             },
@@ -43,26 +54,90 @@
         "insert": {
             "default_car": "i20",
             "default_car_code": "0",
-            "confirm_insert": true
+            "confirmation_select_after_insert": true
         },
-        "import_export": {
-            "file_selection_options": {
+        "import": {
+            "default_file_path": {
+                "primary_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/main.csv",
+                "history_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/history.csv"
+            },
+            "override_data_on_import": false,
+            "override_data_options": ["y", "yes", "o", "over", "override", "1"]
+        },
+        "export": {
+            "default_folder_path": {
+                "primary_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}",
+                "history_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}"
+            },
+            "default_file_name": {
+                "primary_table": "main.csv",
+                "history_table": "history.csv"
+            }
+        },
+        "import__export": {
+            "location_selection": {
                 "GUI": "gui",
                 "Default": "d",
                 "Path": "path"
-            },
-            "override_data_on_import": false,
-            "override_data_options": ["y", "yes", "o", "over", "override", "1"] 
+            }
         },
         "switch": {
             "dashboard_after_switch": true
         }
     },
-    
-    "dashboard_on_startup": true,
-    
-    "dashboard_vertical_spacing": 5,
-    "dashboard_db_box_width": 25,
-    "dashboard_table_box_width": 29,
-    "dashboard_padding": 5
+
+    "ui": {
+        "dashboard": {
+            "display_on_startup": true,
+            "db_box_width": 23,
+            "table_box_width": 27,
+            "vertical_spacing": 3,
+            "padding": 3
+        },
+        "help": {
+            "main_menu_width": 20,
+            "main_menu_column_spacing": 4,
+            "arguments_menu_width": 50
+        },
+        "error": {
+            "separator_count": 58
+        }
+    },
+
+    "command_alias": {
+        "create": "create",
+        "insert": "insert",
+        "select": "select",
+        "history": "history",
+        "import": "import",
+        "export": "export",
+        "delete": "delete",
+        "refresh": "refresh",
+        "psql": "psql",
+        "drop": "drop",
+        "switch": "switch",
+        "help": "help",
+        "dashboard": "dash",
+        "restart": "rst",
+        "end": "end"
+
+    },
+
+    "rally-stage": {
+        "rally": {
+            "Monte-Carlo": ["Agnieres", "Luceram", "Col-De-Braus"],
+            "Sweden": ["Torsby", "Vargasen", "Karlstad"],
+            "Mexico": ["Media-Luna-R", "Ibarrilla", "Leon"],
+            "Argentina": ["El-Condor", "Cuchilla-Nevada"],
+            "Portugal": ["Fafe", "Viana-Do-Castelo", "Felgueiras", "Arganil", "Lousada"],
+            "Italy": ["Baranta", "Lerno", "Ittiri"],
+            "Kenya": ["Ngema", "Seyabei"],
+            "Finland": ["Ouninpohja", "Horkka", "Arvaja", "Pihlajakoski", "Harju"],
+            "New-Zealand": ["Te-Hutewai", "Batley", "Brooks", "Te-Akau-South"],
+            "Turkey": ["Datca", "Cicekli", "Marmaris"],
+            "Germany": ["Moselland", "Freisen", "Panzerplatte"],
+            "Wales": ["Hafren", "Great-Orme", "Brenig"],
+            "Japan": ["Okazaki", "Nagakute", "Shinshiro", "Shitara"]
+        }
+    }
 }

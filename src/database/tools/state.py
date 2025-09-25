@@ -2,9 +2,6 @@ import config as cnfg
 import database.tools.executor as exe
 
 
-TABLES = ("timings", "timings_history")
-
-
 def capture_current_db_state() -> None:
     # Setting aliases for convenience
     DATABASE = cnfg.db_state['database']
@@ -19,17 +16,17 @@ def capture_current_db_state() -> None:
     
     DATABASE['size'] = _get_database_info()
 
-    TIMINGS['exists'] = _table_exists(table="timings")
+    TIMINGS['exists'] = _table_exists(table=cnfg.PRIMARY_TB_NAME)
 
     # TIMINGS info only if EXISTS
     if TIMINGS['exists']:
-        TIMINGS['size'], TIMINGS['data_size'], TIMINGS['records'] = _get_table_info(table="timings")
+        TIMINGS['size'], TIMINGS['data_size'], TIMINGS['records'] = _get_table_info(table=cnfg.PRIMARY_TB_NAME)
     
-    TIMINGS_HISTORY['exists'] = _table_exists(table="timings_history")
+    TIMINGS_HISTORY['exists'] = _table_exists(table=cnfg.HISTORY_TB_NAME)
 
     # TIMINGS_HISTORY info only if EXISTS
     if TIMINGS_HISTORY['exists']:
-        TIMINGS_HISTORY['size'], TIMINGS_HISTORY['data_size'], TIMINGS_HISTORY['records'] = _get_table_info(table="timings_history")
+        TIMINGS_HISTORY['size'], TIMINGS_HISTORY['data_size'], TIMINGS_HISTORY['records'] = _get_table_info(table=cnfg.HISTORY_TB_NAME)
 
 
 def _database_exists() -> bool:

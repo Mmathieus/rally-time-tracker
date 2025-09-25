@@ -8,24 +8,22 @@ import database.tools.executor as exe
 
 
 TABLE_CONFIG = {
-    cnfg.TIMINGS_ALIAS: {
-        'table_name': cnfg.TIMINGS_REAL,
+    cnfg.PRIMARY_TB_ALIAS: {
         'delete_sql': "DELETE FROM timings WHERE id = {id};"
     },
-    cnfg.TIMINGS_HISTORY_ALIAS: {
-        'table_name': cnfg.TIMINGS_HISTORY_REAL,
+    cnfg.HISTORY_TB_ALIAS: {
         'delete_sql': "DELETE FROM timings_history WHERE id = {id};"
     }
 }
 
 
 def delete_manager(table, record_id=None):
-    if table not in (cnfg.TIMINGS_ALIAS, cnfg.TIMINGS_HISTORY_ALIAS):
-        ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="YELLOW")
+    if table not in cnfg.BOTH_TABLES:
+        ff.print_colored(text=f"INVALID TABLE '{table}'.\n", color="RED")
         return
 
     # Check if DB/TABLE exists
-    all_ok, info_message = oo.get_db_exists_state(table=TABLE_CONFIG[table]['table_name'])
+    all_ok, info_message = oo.get_db_exists_state(table=cnfg.get_tb_name(table=table))
     if not all_ok:
         ff.print_colored(text=f"DELETE ABORTED. {info_message}\n", color="YELLOW")
         return

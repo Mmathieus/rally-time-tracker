@@ -10,10 +10,10 @@ import database.tools.executor as exe
 import re
 
 
-DEFAULT_CAR = cnfg.config['operations']['insert']['default_car']
-DEFAULT_CAR_CODE = cnfg.config['operations']['insert']['default_car_code']
+DEFAULT_CAR = cnfg.config['command']['insert']['default_car']
+DEFAULT_CAR_CODE = cnfg.config['command']['insert']['default_car_code']
 
-CONFIRMATION_SELECT_AFTER_INSERT = cnfg.config['operations']['insert']['confirm_insert']
+CONFIRMATION_SELECT_AFTER_INSERT = cnfg.config['command']['insert']['confirmation_select_after_insert']
 
 COMPARING_QUERY = """
     SELECT ROW(
@@ -36,12 +36,12 @@ INSERT_QUERY = """
 def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
     if not rally:
         # RALLY
-        rally = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="RALLY", autocomplete_options=cnfg.get_rallies()))
+        rally = ii.get_user_input(prompt="RALLY", autocomplete_options=cnfg.get_rallies())
         if not rally:
             print(); return
         
         # STAGE
-        stage = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=rally)))
+        stage = ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=rally))
         if not stage:
             print(); return
         
@@ -55,7 +55,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
         if not time:
             print(); return
     
-    # TIME validations
+    # TIME validation
     if not _validate_time_format(time=time):
         print(
             f"{ff.colorize(text=f"INVALID TIME FORMAT.", color="RED")} "
@@ -63,12 +63,13 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
         )
         return
 
-    # Check if DB/TABLE exists (timings)
-    all_ok, info_message = oo.get_db_exists_state(table="timings", include_table_name=True)
+    # Check if DB/TABLE exists (primary)
+    all_ok, info_message = oo.get_db_exists_state(table=cnfg.PRIMARY_TB_NAME, include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return
     
+    rally, stage = map(ff.to_pascal_kebab_case, (rally, stage))
     # Replace last ':' for '.'
     time = re.sub(r':([^:]*)$', r'.\1', time)
 
@@ -90,7 +91,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
             return
     
     # Check if DB/TABLE exists (timings_history)
-    all_ok, info_message = oo.get_db_exists_state(table="timings_history", include_table_name=True)
+    all_ok, info_message = oo.get_db_exists_state(table=cnfg.HISTORY_TB_NAME, include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return
@@ -105,20 +106,15 @@ def _insert_exec(rally, stage, car, time, gain, old_record_id) -> None:
     exe.execute_query(sql=INSERT_QUERY.format(rally=rally, stage=stage, car=car, time=time, delete_query=delete_query), header=False, capture=True)
 
     print(
-        f"{ff.colorize(text="NEW RECORD INSERTED INTO 'timings' TABLE.\n", color="GREEN")}"
-        f"{ff.colorize(text="NEW RECORD INSERTED INTO 'timings_history' TABLE.", color="GREEN")}"
+        f"{ff.colorize(text=f"NEW RECORD INSERTED INTO '{cnfg.PRIMARY_TB_NAME}' TABLE.\n", color="GREEN")}"
+        f"{ff.colorize(text=f"NEW RECORD INSERTED INTO '{cnfg.HISTORY_TB_NAME}' TABLE.", color="GREEN")}"
     )
-
-    # ff.print_colored(text="NEW RECORD INSERTED INTO 'timings' TABLE.", color="GREEN")
-    # ff.print_colored(text="NEW RECORD INSERTED INTO 'timings_history' TABLE.", color="GREEN")
 
     if gain:
         print(
-            f"{ff.colorize(text="OLD RECORD DELETED FROM 'timings' TABLE.\n", color="GREEN")}"
+            f"{ff.colorize(text=f"OLD RECORD DELETED FROM '{cnfg.PRIMARY_TB_NAME}' TABLE.\n", color="GREEN")}"
             f"{ff.colorize(text=f"- {gain}", color="MAGENTA")}"
         )
-        # ff.print_colored(text="OLD RECORD DELETED FROM 'timings' TABLE.", color="GREEN")
-        # ff.print_colored(text=f"- {gain}", color="MAGENTA")
 
     print()
     if CONFIRMATION_SELECT_AFTER_INSERT:
