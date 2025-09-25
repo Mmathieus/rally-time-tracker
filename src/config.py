@@ -9,19 +9,19 @@ with config_path.open('r', encoding='utf-8') as file:
     config = json.load(file)
 
 
-# For DB Dashboard  ##! TO BE ...
+# For DB Dashboard
 db_state = {
     'database': { 
         'exists': None,
         'size': None
     },
-    'timings': { ##
+    'timings': {
         'exists': None,
         'size': None,
         'data_size': None,
         'records': None
     },
-    'timings_history': { ##
+    'timings_history': {
         'exists': None,
         'size': None,
         'data_size': None,

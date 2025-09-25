@@ -22,8 +22,6 @@ import services.dashboard as dshbrd
 import services.restart as rstrt
 import services.end as end
 
-import traceback
-
 
 def _parse_user_command(command_string) -> tuple[str, list[str], int]:
     parts = command_string.strip().split()
