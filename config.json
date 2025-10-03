@@ -2,7 +2,7 @@
     "database": {
         "credentials": {
             "user": "postgres",
-            "database": "wrc9database"
+            "database": "wrc10database"
         },
         "available_databases": ["wrc9database", "wrc10database"],
         "reference": "db"
@@ -137,7 +137,9 @@
             "Turkey": ["Datca", "Cicekli", "Marmaris"],
             "Germany": ["Moselland", "Freisen", "Panzerplatte"],
             "Wales": ["Hafren", "Great-Orme", "Brenig"],
-            "Japan": ["Okazaki", "Nagakute", "Shinshiro", "Shitara"]
+            "Japan": ["Okazaki", "Nagakute", "Shinshiro", "Shitara"],
+            "Greece": ["Psatha", "Amfissa", "Paleohori"],
+            "Chile": ["Lircay", "Biobio", "Pelun"]
         }
     }
 }

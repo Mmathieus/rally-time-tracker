@@ -13,7 +13,7 @@ RECORDS_FROM_NEWEST = cnfg.config['command']['select']['records_order']['from_ne
 
 RECORDS_ORDER_OPTIONS = RECORDS_FROM_OLDEST + RECORDS_FROM_NEWEST
 
-DEFAULT_ORDER = " ORDER BY rally, time ASC, stage;"
+DEFAULT_ORDER = " ORDER BY rally, time, stage;"
 
 
 def select_manager(search_term=None, time_order=None, order_limit=None) -> None:

@@ -59,8 +59,16 @@ def _create_database() -> None:
     if not all_ok:
         ff.print_colored(text=f"DATABASE '{cnfg.DB_NAME}' NOT CREATED. {info_message}\n", color="YELLOW")
         return
+    
+    CREATE_DB_SQL = f"""
+        CREATE DATABASE {cnfg.DB_NAME}
+            ENCODING = 'UTF8'
+            LC_COLLATE = 'en_US.UTF-8'
+            LC_CTYPE = 'en_US.UTF-8'
+            TEMPLATE = template0;
+    """
 
-    exe.execute_query(sql=f"CREATE DATABASE {cnfg.DB_NAME};", header=False, capture=True, postgres_db=True)
+    exe.execute_query(sql=CREATE_DB_SQL, header=False, capture=True, postgres_db=True)
 
     ff.print_colored(text=f"DATABASE '{cnfg.DB_NAME}' CREATED.\n", color="GREEN")
     

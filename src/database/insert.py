@@ -41,7 +41,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
             print(); return
         
         # STAGE
-        stage = ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=rally))
+        stage = ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=ff.to_pascal_kebab_case(term=rally)))
         if not stage:
             print(); return
         

@@ -15,7 +15,7 @@ HISTORY_QUERY_ALL = """
 
 HISTORY_QUERY_SPECIFIC = """
     SELECT
-        id rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time,
+        id, rally, stage, car, TO_CHAR(time, 'MI:SS:MS') AS time,
         TO_CHAR(imprvmnt, '"-"MI:SS:MS') AS gain,
         TO_CHAR(SUM(imprvmnt) OVER (PARTITION BY stage ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), '"-"MI:SS:MS') AS total_gain,
         created_at
