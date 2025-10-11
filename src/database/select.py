@@ -28,7 +28,7 @@ def select_manager(search_term=None, time_order=None, order_limit=None) -> None:
         return
     
     # Selecting RALLY
-    rally = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="RALLY", autocomplete_options=list(cnfg.WRC_DICT.keys())))
+    rally = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="RALLY", autocomplete_options=list(cnfg.WRC_RALLIES.keys())))
 
     stage_options = cnfg.get_stages(rally=rally)
     # Selecting STAGE

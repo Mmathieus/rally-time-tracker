@@ -59,25 +59,28 @@ TABLES_ALIAS = config['table']['reference']['both_tables']
 EVERYTHING_ALIAS = config['other_reference']['everything']
 
 
-WRC_DICT = config['rally-stage']['rally']
+COMMANDS_ALIAS = config['other_reference']['commands']
+
+
+WRC_RALLIES = config['rally-data']['rallies']
 
 def get_rallies():
-    return list(WRC_DICT.keys())
+    return list(WRC_RALLIES.keys())
 
 def get_stages(rally=None) -> list[str]:
     # All STAGES -> no RALLY typed
     if not rally:
         stage_options = []
-        for stages in WRC_DICT.values():
+        for stages in WRC_RALLIES.values():
             stage_options.extend(stages)
         return stage_options
 
     # STAGES for specific RALLY
-    if rally in WRC_DICT:
-        return WRC_DICT[rally]
+    if rally in WRC_RALLIES:
+        return WRC_RALLIES[rally]
     
     # RALLY typed but not recognized -> no corresponding STAGES
     return []
 
 
-COMMANDS_ALIAS = config['other_reference']['commands']
+WRC_CARS = config['rally-data']['cars']

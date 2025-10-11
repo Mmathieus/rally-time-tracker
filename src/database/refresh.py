@@ -18,6 +18,12 @@ DATA_OPTIONS = KEEP_DATA_OPTIONS + LOSE_DATA_OPTIONS
 
 
 def refresh_manager(table, keep_data=None) -> None:
+    if table == cnfg.EVERYTHING_ALIAS:
+        print()
+        _refresh_table(table=cnfg.PRIMARY_TB_ALIAS, keep_data=keep_data)
+        _refresh_table(table=cnfg.HISTORY_TB_ALIAS, keep_data=keep_data)
+        return
+
     if table not in cnfg.BOTH_TABLES:
         ff.print_colored(text=f"INVALID TABLE NAME '{table}'.\n", color="RED")
         return
@@ -28,18 +34,25 @@ def refresh_manager(table, keep_data=None) -> None:
         ff.print_colored(text=f"TABLE '{cnfg.get_tb_name(table=table)}' NOT REFRESHED. {info_message}\n", color="YELLOW")
         return
     
-    if not keep_data:
-        CONFIG_KEEP_DATA = cnfg.config['command']['refresh']['keep_data_on_refresh']
-        keep_data = KEEP_DATA_OPTIONS[0] if CONFIG_KEEP_DATA else LOSE_DATA_OPTIONS[0]
+    # if not keep_data:
+    #     CONFIG_KEEP_DATA = cnfg.config['command']['refresh']['keep_data_on_refresh']
+    #     keep_data = KEEP_DATA_OPTIONS[0] if CONFIG_KEEP_DATA else LOSE_DATA_OPTIONS[0]
     
-    validated, validation_message = vv.validate_choice(choice=keep_data, valid_options=DATA_OPTIONS, choice_name="KEEP_DATA")
-    if not validated:
-        ff.print_colored(text=f"{validation_message}\n", color="RED")
-        return
+    # validated, validation_message = vv.validate_choice(choice=keep_data, valid_options=DATA_OPTIONS, choice_name="KEEP_DATA")
+    # if not validated:
+    #     ff.print_colored(text=f"{validation_message}\n", color="RED")
+    #     return
     
     _refresh_table(table=table, keep_data=keep_data)
 
 def _refresh_table(table, keep_data) -> None:
+    keep_data = _determine_keep_data(keep_data_value=keep_data)
+
+    validated, validation_message = vv.validate_choice(choice=keep_data, valid_options=DATA_OPTIONS, choice_name="KEEP_DATA")
+    if not validated:
+        ff.print_colored(text=f"{validation_message}\n", color="RED")
+        return
+
     TABLE_NAME = cnfg.get_tb_name(table=table)
 
     if keep_data in KEEP_DATA_OPTIONS:
@@ -70,3 +83,10 @@ def _refresh_table(table, keep_data) -> None:
     sqnc.update_sequence()
 
     ff.print_colored(text=f"TABLE '{TABLE_NAME}' REFRESHED. {data_status}\n", color="GREEN")
+
+
+def _determine_keep_data(keep_data_value) -> str:
+    if not keep_data_value:
+        CONFIG_KEEP_DATA = cnfg.config['command']['refresh']['keep_data_on_refresh']
+        keep_data_value = KEEP_DATA_OPTIONS[0] if CONFIG_KEEP_DATA else LOSE_DATA_OPTIONS[0]
+    return keep_data_value

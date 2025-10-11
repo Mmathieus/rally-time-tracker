@@ -104,27 +104,8 @@
         }
     },
 
-    "command_alias": {
-        "create": "create",
-        "insert": "insert",
-        "select": "select",
-        "history": "history",
-        "import": "import",
-        "export": "export",
-        "delete": "delete",
-        "refresh": "refresh",
-        "psql": "psql",
-        "drop": "drop",
-        "switch": "switch",
-        "help": "help",
-        "dashboard": "dash",
-        "restart": "rst",
-        "end": "end"
-
-    },
-
-    "rally-stage": {
-        "rally": {
+    "rally-data": {
+        "rallies": {
             "Monte-Carlo": ["Agnieres", "Luceram", "Col-De-Braus"],
             "Sweden": ["Torsby", "Vargasen", "Karlstad"],
             "Mexico": ["Media-Luna-R", "Ibarrilla", "Leon"],
@@ -138,8 +119,12 @@
             "Germany": ["Moselland", "Freisen", "Panzerplatte"],
             "Wales": ["Hafren", "Great-Orme", "Brenig"],
             "Japan": ["Okazaki", "Nagakute", "Shinshiro", "Shitara"],
+            
+            "Croatia": ["Grdanjci", "Jaskovo", "Rude"],
+            "Estonia": ["Elva", "Otepaa"],
             "Greece": ["Psatha", "Amfissa", "Paleohori"],
             "Chile": ["Lircay", "Biobio", "Pelun"]
-        }
+        },
+        "cars": ["i20", "yaris", "fiesta"]
     }
 }

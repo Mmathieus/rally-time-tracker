@@ -2,8 +2,14 @@ from prompt_toolkit import prompt as prmnt
 from prompt_toolkit.completion import WordCompleter
 
 
-def get_user_input(symbol='◇', prompt="Select an option", with_colon=True, lowercase=True, autocomplete_options=None) -> str:
-    final_prompt = f"{symbol} {prompt}{':' if with_colon else ''} "
+def get_user_input(symbol='◇', prompt="Select an option", with_colon=True, lowercase=True, autocomplete_options=None, align_width=None) -> str:
+    colon = ':' if with_colon else ''
+    label = f"{symbol} {prompt}{colon}"
+    
+    if align_width:
+        label = label.ljust(align_width)
+    
+    final_prompt = f"{label} "
     
     if autocomplete_options:
         completer = WordCompleter(autocomplete_options, ignore_case=True)
@@ -11,6 +17,4 @@ def get_user_input(symbol='◇', prompt="Select an option", with_colon=True, low
     else:
         user_input = input(final_prompt).strip()
         
-    if lowercase:
-        return user_input.lower()
-    return user_input
+    return user_input.lower() if lowercase else user_input

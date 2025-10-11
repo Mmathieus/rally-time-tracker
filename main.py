@@ -124,8 +124,8 @@ commands = {
             2: lambda T, KD: rfrsh.refresh_manager(table=T, keep_data=KD)
         },
         'args': {
-            1: ("<table>",),
-            2: ("<table>", "[preserve]")
+            1: ("<table|all>",),
+            2: ("<table|all>", "[preserve]")
         }
     },
     cnfg.COMMANDS_ALIAS['psql']: {
@@ -143,7 +143,7 @@ commands = {
             1: lambda T : cd.drop_exec(target=T)
         },
         'args': {
-            1: ("<table|database>",)
+            1: ("<table|database|all>",)
         }
     },
     cnfg.COMMANDS_ALIAS['switch']: {

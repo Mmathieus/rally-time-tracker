@@ -35,23 +35,25 @@ INSERT_QUERY = """
 
 def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
     if not rally:
+        INPUT_ALIGN_WIDTH = 8
+
         # RALLY
-        rally = ii.get_user_input(prompt="RALLY", autocomplete_options=cnfg.get_rallies())
+        rally = ii.get_user_input(prompt="RALLY", autocomplete_options=cnfg.get_rallies(), align_width=INPUT_ALIGN_WIDTH)
         if not rally:
             print(); return
         
         # STAGE
-        stage = ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=ff.to_pascal_kebab_case(term=rally)))
+        stage = ii.get_user_input(prompt="STAGE", autocomplete_options=cnfg.get_stages(rally=ff.to_pascal_kebab_case(term=rally)), align_width=INPUT_ALIGN_WIDTH)
         if not stage:
             print(); return
         
         # CAR
-        car = ii.get_user_input(prompt="CAR")
+        car = ii.get_user_input(prompt="CAR", autocomplete_options=cnfg.WRC_CARS, align_width=INPUT_ALIGN_WIDTH)
         if not car:
             print(); return
         
         #TIME
-        time = ii.get_user_input(prompt="TIME")
+        time = ii.get_user_input(prompt="TIME", align_width=INPUT_ALIGN_WIDTH)
         if not time:
             print(); return
     
