@@ -9,7 +9,8 @@ import os
 
 ###- THANKS TO Claude Sonnet 4 FOR THIS -###
 
-def print_detailed_error(exception, use_colors=True):    
+
+def print_detailed_error(exception):    
     # Get error information
     exc_type = type(exception).__name__
     exc_message = str(exception)
@@ -32,8 +33,10 @@ def print_detailed_error(exception, use_colors=True):
         code_line = "unknown"
 
 
-    # Separators
+    # Separators | If something wrong with config value -> backup default set
     SEP_COUNT = cnfg.config['ui']['error']['separator_count']
+    if not isinstance(SEP_COUNT, int):
+        SEP_COUNT = 60
 
     top_separator = "╔" + "═" * SEP_COUNT + "╗"
     middle_separator = "╠" + "═" * SEP_COUNT + "╣"

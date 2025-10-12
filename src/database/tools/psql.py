@@ -1,11 +1,11 @@
 import utils.formatter as ff
-import utils.other as oo
 
 import database.tools.executor as exe
+import database.tools.other as othr
 
 
 def psql_exec() -> None:
-    all_ok, info_message = oo.get_db_exists_state()
+    all_ok, info_message = othr.get_db_exists_state()
     if not all_ok:
         ff.print_colored(text=f"PSQL SHELL NOT AVAILABLE. {info_message}\n", color="YELLOW")
         return

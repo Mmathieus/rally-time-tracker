@@ -13,6 +13,11 @@ colors = {
     "RESET": "\033[0m"
 }
 
+formats = {
+    "BOLD": "\033[1m",
+    "DIM": "\033[2m"
+}
+
 def print_colored(text, color=None, really_print=True) -> None:
     if really_print:
         if color:

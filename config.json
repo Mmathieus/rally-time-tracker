@@ -95,9 +95,9 @@
             "padding": 3
         },
         "help": {
-            "main_menu_width": 20,
-            "main_menu_column_spacing": 4,
-            "arguments_menu_width": 50
+            "main_menu_column_width": 25,
+            "main_menu_columns_spacing": 8,
+            "arguments_menu_width": -1
         },
         "error": {
             "separator_count": 58

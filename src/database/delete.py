@@ -2,9 +2,9 @@ import config as cnfg
 
 import utils.formatter as ff
 import utils.inputter as ii
-import utils.other as oo
 
 import database.tools.executor as exe
+import database.tools.other as othr
 
 
 TABLE_CONFIG = {
@@ -23,7 +23,7 @@ def delete_manager(table, record_id=None):
         return
 
     # Check if DB/TABLE exists
-    all_ok, info_message = oo.get_db_exists_state(table=cnfg.get_tb_name(table=table))
+    all_ok, info_message = othr.get_db_exists_state(table=cnfg.get_tb_name(table=table))
     if not all_ok:
         ff.print_colored(text=f"DELETE ABORTED. {info_message}\n", color="YELLOW")
         return

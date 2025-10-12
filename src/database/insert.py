@@ -2,10 +2,10 @@ import config as cnfg
 
 import utils.formatter as ff
 import utils.inputter as ii
-import utils.other as oo
 
 import database.select as slct
 import database.tools.executor as exe
+import database.tools.other as othr
 
 import re
 
@@ -66,7 +66,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
         return
 
     # Check if DB/TABLE exists (primary)
-    all_ok, info_message = oo.get_db_exists_state(table=cnfg.PRIMARY_TB_NAME, include_table_name=True)
+    all_ok, info_message = othr.get_db_exists_state(table=cnfg.PRIMARY_TB_NAME, include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return
@@ -93,7 +93,7 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
             return
     
     # Check if DB/TABLE exists (timings_history)
-    all_ok, info_message = oo.get_db_exists_state(table=cnfg.HISTORY_TB_NAME, include_table_name=True)
+    all_ok, info_message = othr.get_db_exists_state(table=cnfg.HISTORY_TB_NAME, include_table_name=True)
     if not all_ok:
         ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
         return

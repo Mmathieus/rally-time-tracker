@@ -1,4 +1,5 @@
 import config as cnfg
+import tempfile
 
 
 def get_db_exists_state(table=None, must_exists=True, include_table_name=False) -> tuple[bool, str]:
@@ -38,3 +39,10 @@ def get_db_exists_state(table=None, must_exists=True, include_table_name=False) 
     # Table musn't exists AND it doesn't
     elif not must_exists and not table_exists:
         return True, f"TABLE {table_name}DOESN'T EXIST."
+
+
+def create_tmp_sql_file(sql_content) -> str:
+    tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.sql', delete=False, encoding='utf-8')
+    tmp_file.write(sql_content)
+    tmp_file.close()
+    return tmp_file.name
