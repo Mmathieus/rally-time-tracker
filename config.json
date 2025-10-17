@@ -58,16 +58,16 @@
         },
         "import": {
             "default_file_path": {
-                "primary_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/main.csv",
-                "history_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}/history.csv"
+                "primary_table": "C:/Users/matus/personal/rally-tracker/data/{database}/main.csv",
+                "history_table": "C:/Users/matus/personal/rally-tracker/data/{database}/history.csv"
             },
             "override_data_on_import": false,
             "override_data_options": ["y", "yes", "o", "over", "override", "1"]
         },
         "export": {
             "default_folder_path": {
-                "primary_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}",
-                "history_table": "C:/Users/matus/Desktop/RallyDatabase/data/{database}"
+                "primary_table": "C:/Users/matus/personal/rally-tracker/data/{database}",
+                "history_table": "C:/Users/matus/personal/rally-tracker/data/{database}"
             },
             "default_file_name": {
                 "primary_table": "main.csv",
@@ -112,7 +112,7 @@
             "Argentina": ["El-Condor", "Cuchilla-Nevada"],
             "Portugal": ["Fafe", "Viana-Do-Castelo", "Felgueiras", "Arganil", "Lousada"],
             "Italy": ["Baranta", "Lerno", "Ittiri"],
-            "Kenya": ["Ngema", "Seyabei"],
+            "Kenya": ["Ngema", "Seyabei", "Kasarani"],
             "Finland": ["Ouninpohja", "Horkka", "Arvaja", "Pihlajakoski", "Harju"],
             "New-Zealand": ["Te-Hutewai", "Batley", "Brooks", "Te-Akau-South"],
             "Turkey": ["Datca", "Cicekli", "Marmaris"],

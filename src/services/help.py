@@ -76,7 +76,7 @@ def _display_columns_side_by_side(columns) -> None:
         border = "═" * (column_width - 2)
         
         # Number of spaces for padding
-        header_display_width = ff.get_display__width("║") + 1 + ff.get_display__width(header_text) + 1 + ff.get_display__width("║")
+        header_display_width = ff.get_display_width("║") + 1 + ff.get_display_width(header_text) + 1 + ff.get_display_width("║")
         padding_total = column_width - header_display_width
         padding_left = padding_total // 2
         padding_right = padding_total - padding_left
@@ -113,8 +113,8 @@ def _display_columns_side_by_side(columns) -> None:
             
             if item_idx < len(items):
                 left_text, right_text = items[item_idx]
-                left_display_width = ff.get_display__width(left_text)
-                right_display_width = ff.get_display__width(right_text)
+                left_display_width = ff.get_display_width(left_text)
+                right_display_width = ff.get_display_width(right_text)
                 
                 # Number of dots for padding: total width - left text - right text
                 dots_count = column_width - left_display_width - right_display_width
@@ -143,13 +143,13 @@ def _display_columns_side_by_side(columns) -> None:
 
 def _calculate_column_width(header_text, items):
     # Header width: '║' + ' ' + text + ' ' + '║'
-    header_width = ff.get_display__width("║") + 1 + ff.get_display__width(header_text) + 1 + ff.get_display__width("║")
+    header_width = ff.get_display_width("║") + 1 + ff.get_display_width(header_text) + 1 + ff.get_display_width("║")
     
     # Width of the longest item
     max_item_width = 0
     for left_text, right_text in items:
         # command + 3 dots + #xx
-        item_width = ff.get_display__width(left_text) + 3 + ff.get_display__width(right_text)
+        item_width = ff.get_display_width(left_text) + 3 + ff.get_display_width(right_text)
         max_item_width = max(max_item_width, item_width)
     
     # Required width is the maximum of header and items
@@ -166,7 +166,7 @@ def _calculate_column_width(header_text, items):
         value = MAIN_MENU_COLUMN_WIDTH
 
     # Header text width and final width must have the same parity for good appearance
-    return _ensure_same_parity(value, ff.get_display__width(header_text))
+    return _ensure_same_parity(value, ff.get_display_width(header_text))
 
 
 def display_command_arguments_menu(command, commands_dict) -> None:
@@ -200,13 +200,13 @@ def display_command_arguments_menu(command, commands_dict) -> None:
 def _draw_header_with_menu_options(header_text, items, add_spacing=False) -> None:
     # Calculate final width
     # Header width: '║' + ' ' + text + ' ' + '║'
-    header_width = ff.get_display__width("║") + 1 + ff.get_display__width(header_text) + 1 + ff.get_display__width("║")
+    header_width = ff.get_display_width("║") + 1 + ff.get_display_width(header_text) + 1 + ff.get_display_width("║")
     
     # Width of the longest item
     max_item_width = 0
     for left_text, right_text in items:
         # command + 3 dots + #xx
-        item_width = ff.get_display__width(left_text) + 3 + ff.get_display__width(right_text)
+        item_width = ff.get_display_width(left_text) + 3 + ff.get_display_width(right_text)
         max_item_width = max(max_item_width, item_width)
     
     # Required width is the maximum of header and items
@@ -223,14 +223,14 @@ def _draw_header_with_menu_options(header_text, items, add_spacing=False) -> Non
         final_width = COMMANDS_ARGUMENTS_MENU_WIDTH
     
     # Header text width and final width must have the same parity for good appearance
-    final_width = _ensure_same_parity(final_width, ff.get_display__width(header_text))
+    final_width = _ensure_same_parity(final_width, ff.get_display_width(header_text))
     
     # Create header
     # Minus left and right corners
     border = "═" * (final_width - 2)
     
     # Number of spaces for header padding
-    header_display_width = ff.get_display__width("║") + 1 + ff.get_display__width(header_text) + 1 + ff.get_display__width("║")
+    header_display_width = ff.get_display_width("║") + 1 + ff.get_display_width(header_text) + 1 + ff.get_display_width("║")
     padding_total = final_width - header_display_width
     padding_left = padding_total // 2
     padding_right = padding_total - padding_left
@@ -243,8 +243,8 @@ def _draw_header_with_menu_options(header_text, items, add_spacing=False) -> Non
     
     # Print items
     for i, (left_text, right_text) in enumerate(items):
-        left_display_width = ff.get_display__width(left_text)
-        right_display_width = ff.get_display__width(right_text)
+        left_display_width = ff.get_display_width(left_text)
+        right_display_width = ff.get_display_width(right_text)
         
         # Number of dots for padding: total width - left text - right text
         dots_count = final_width - left_display_width - right_display_width
