@@ -2,7 +2,6 @@ import config as cnfg
 
 import utils.formatter as ff
 import utils.inputter as ii
-import utils.menu as mm
 import utils.validator as vv
 
 import database.tools.executor as exe
@@ -40,7 +39,7 @@ def export_manager(table, method=None) -> None:
         # Selecting folder-selection method (Path method excluded (file path is part of the command call and can't be typed afterwards))
         if not method:
             LIMITED_METHOD_OPTIONS = (GUI, DEFAULT)
-            mm.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in LIMITED_METHOD_OPTIONS))
+            ff.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in LIMITED_METHOD_OPTIONS))
             method = ii.get_user_input()
 
             if not method:
@@ -86,7 +85,7 @@ def export_manager(table, method=None) -> None:
         return
 
     # Method wasn't selected - Asking for it
-    mm.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
+    ff.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
     method_choice = ii.get_user_input()
     
     # Validating selected method

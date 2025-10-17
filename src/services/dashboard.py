@@ -1,5 +1,5 @@
 import config as cnfg
-import utils.menu as mm
+import utils.formatter as ff
 import database.tools.state as stt
 import re
 
@@ -11,6 +11,7 @@ DASHBOARD_PADDING = cnfg.config['ui']['dashboard']['padding']
 
 
 ###- THANKS TO Claude Sonnet 4 FOR THIS -###
+
 
 def display_dashboard(
         vertical_spacing=VERTICAL_SPACING,
@@ -35,8 +36,8 @@ def display_dashboard(
     
     # Header
     header = "DASHBOARD"
-    header_padding = (dashboard_width - 2 - mm.get_display_width(header)) // 2
-    lines.append(f"│{' ' * header_padding}{header}{' ' * (dashboard_width - 2 - header_padding - mm.get_display_width(header))}│")
+    header_padding = (dashboard_width - 2 - ff.get_display__width(header)) // 2
+    lines.append(f"│{' ' * header_padding}{header}{' ' * (dashboard_width - 2 - header_padding - ff.get_display__width(header))}│")
     lines.append(f"├{'─' * (dashboard_width - 2)}┤")
     
     # Empty line
@@ -72,8 +73,8 @@ def display_dashboard(
     
     # Top border of database box with centered DATABASE label
     db_header = "DATABASE"
-    db_header_padding = (db_box_width - 2 - mm.get_display_width(db_header)) // 2
-    db_header_line = f"{'─' * db_header_padding} {db_header} {'─' * (db_box_width - 2 - db_header_padding - mm.get_display_width(db_header) - 2)}"
+    db_header_padding = (db_box_width - 2 - ff.get_display__width(db_header)) // 2
+    db_header_line = f"{'─' * db_header_padding} {db_header} {'─' * (db_box_width - 2 - db_header_padding - ff.get_display__width(db_header) - 2)}"
     lines.append(f"│{' ' * (db_start_pos - 1)}┌{db_header_line}┐{' ' * (dashboard_width - db_start_pos - db_box_width - 1)}│")
     
     # Database box content
@@ -82,12 +83,12 @@ def display_dashboard(
             line_clean = _strip_ansi(line)
             # Center database name
             if "\033[32m✓\033[0m" in line or "\033[31m✗\033[0m" in line:
-                padding = (db_box_width - 2 - mm.get_display_width(line_clean)) // 2
-                line_content = f"{' ' * padding}{line}{' ' * (db_box_width - 2 - padding - mm.get_display_width(line_clean))}"
+                padding = (db_box_width - 2 - ff.get_display__width(line_clean)) // 2
+                line_content = f"{' ' * padding}{line}{' ' * (db_box_width - 2 - padding - ff.get_display__width(line_clean))}"
             else:
                 # Other information left-aligned with padding
                 padding_left = 2
-                padding_right = db_box_width - 2 - padding_left - mm.get_display_width(line_clean)
+                padding_right = db_box_width - 2 - padding_left - ff.get_display__width(line_clean)
                 line_content = f"{' ' * padding_left}{line}{' ' * padding_right}"
         else:
             # Empty line
@@ -224,8 +225,8 @@ def _create_single_table_box(content, width) -> list:
     
     # Top border with TABLE header
     table_header = "TABLE"
-    table_header_padding = (width - 2 - mm.get_display_width(table_header)) // 2
-    table_header_line = f"{'─' * table_header_padding} {table_header} {'─' * (width - 2 - table_header_padding - mm.get_display_width(table_header) - 2)}"
+    table_header_padding = (width - 2 - ff.get_display__width(table_header)) // 2
+    table_header_line = f"{'─' * table_header_padding} {table_header} {'─' * (width - 2 - table_header_padding - ff.get_display__width(table_header) - 2)}"
     box_lines.append(f"┌{table_header_line}┐")
     
     # Content lines
@@ -263,9 +264,9 @@ def _create_table_content(table_info, table_name, db_exists) -> list:
         
         # Find longest label for alignment
         if info_lines:
-            max_label_width = max(mm.get_display_width(label) for label, _ in info_lines)
+            max_label_width = max(ff.get_display__width(label) for label, _ in info_lines)
             for label, value in info_lines:
-                padding = max_label_width - mm.get_display_width(label)
+                padding = max_label_width - ff.get_display__width(label)
                 content.append(f"{label}{' ' * padding} {value}")
         
         # Add empty line at the end only if we have info lines
@@ -286,7 +287,7 @@ def _format_table_line(text, width) -> str:
         return ' ' * (width - 2)
     
     text_clean = _strip_ansi(text)
-    text_width = mm.get_display_width(text_clean)
+    text_width = ff.get_display__width(text_clean)
     
     # Center table names (those with checkmarks/x-marks)
     if "\033[32m✓\033[0m" in text or "\033[31m✗\033[0m" in text:

@@ -2,7 +2,6 @@ import config as cnfg
 
 import utils.formatter as ff
 import utils.inputter as ii
-import utils.menu as mm
 import utils.validator as vv
 
 import database.tools.state as stt
@@ -25,7 +24,7 @@ def switch_manager(database=None) -> None:
         if len(VALID_DATABASES) == 1:
             database, = VALID_DATABASES
         else:
-            mm.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES)
+            ff.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES)
             database = ii.get_user_input()
 
             if not database:

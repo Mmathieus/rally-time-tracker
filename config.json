@@ -122,7 +122,9 @@
             
             "Croatia": ["Grdanjci", "Jaskovo", "Rude"],
             "Estonia": ["Elva", "Otepaa"],
+            "Belgium": ["Dikkebus", "Kemmelberg"],
             "Greece": ["Psatha", "Amfissa", "Paleohori"],
+            "Spain": ["Riudecanyes", "Savalla"],
             "Chile": ["Lircay", "Biobio", "Pelun"]
         },
         "cars": ["i20", "yaris", "fiesta"]

@@ -20,5 +20,4 @@ import services.dashboard as dshbrd
 stt.capture_current_db_state()
 
 if cnfg.config['ui']['dashboard']['display_on_startup']:
-    # ff.print_colored(text="LOADING DASHBOARD...\n", color="GREEN")
     dshbrd.display_dashboard(refresh_db_state=False)
