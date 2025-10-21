@@ -120,8 +120,8 @@ commands = {
     cnfg.COMMANDS_ALIAS['refresh']: {
         'emoji': '🔄',
         'calls': {
-            1: lambda T: rfrsh.refresh_manager(table=T),
-            2: lambda T, KD: rfrsh.refresh_manager(table=T, keep_data=KD)
+            1: lambda T: rfrsh.refresh_manager(target=T),
+            2: lambda T, KD: rfrsh.refresh_manager(target=T, keep_data=KD)
         },
         'args': {
             1: ("<table|all>",),

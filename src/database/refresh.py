@@ -16,33 +16,24 @@ LOSE_DATA_OPTIONS = cnfg.config['command']['refresh']['data_handling']['lose']
 DATA_OPTIONS = KEEP_DATA_OPTIONS + LOSE_DATA_OPTIONS
 
 
-def refresh_manager(table, keep_data=None) -> None:
-    if table == cnfg.EVERYTHING_ALIAS:
+def refresh_manager(target, keep_data=None) -> None:
+    if target == cnfg.EVERYTHING_ALIAS:
         print()
         _refresh_table(table=cnfg.PRIMARY_TB_ALIAS, keep_data=keep_data)
         _refresh_table(table=cnfg.HISTORY_TB_ALIAS, keep_data=keep_data)
         return
 
-    if table not in cnfg.BOTH_TABLES:
-        ff.print_colored(text=f"INVALID TABLE NAME '{table}'.\n", color="RED")
+    if target not in cnfg.BOTH_TABLES:
+        ff.print_colored(text=f"INVALID TABLE NAME '{target}'.\n", color="RED")
         return
     
     # Check if DB/TABLE exists
-    all_ok, info_message = othr.get_db_exists_state(table=cnfg.get_tb_name(table=table))
+    all_ok, info_message = othr.get_db_exists_state(table=cnfg.get_tb_name(table=target))
     if not all_ok:
-        ff.print_colored(text=f"TABLE '{cnfg.get_tb_name(table=table)}' NOT REFRESHED. {info_message}\n", color="YELLOW")
+        ff.print_colored(text=f"TABLE '{cnfg.get_tb_name(table=target)}' NOT REFRESHED. {info_message}\n", color="YELLOW")
         return
     
-    # if not keep_data:
-    #     CONFIG_KEEP_DATA = cnfg.config['command']['refresh']['keep_data_on_refresh']
-    #     keep_data = KEEP_DATA_OPTIONS[0] if CONFIG_KEEP_DATA else LOSE_DATA_OPTIONS[0]
-    
-    # validated, validation_message = vv.validate_choice(choice=keep_data, valid_options=DATA_OPTIONS, choice_name="KEEP_DATA")
-    # if not validated:
-    #     ff.print_colored(text=f"{validation_message}\n", color="RED")
-    #     return
-    
-    _refresh_table(table=table, keep_data=keep_data)
+    _refresh_table(table=target, keep_data=keep_data)
 
 def _refresh_table(table, keep_data) -> None:
     keep_data = _determine_keep_data(keep_data_value=keep_data)
