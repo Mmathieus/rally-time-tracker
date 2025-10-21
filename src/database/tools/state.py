@@ -12,6 +12,10 @@ def capture_current_db_state() -> None:
 
     # DATABASE not present -> nothing (else) we can do
     if not DATABASE['exists']:
+        # Override everything to 'None' (functional reason)
+        TIMINGS.update({key: None for key in TIMINGS})
+        TIMINGS_HISTORY.update({key: None for key in TIMINGS_HISTORY})
+        # Overriding 'DATABASE['size']' is not neccesary
         return
     
     DATABASE['size'] = _get_database_info()
