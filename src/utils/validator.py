@@ -16,10 +16,15 @@ def validate_type(variable, expected_type) -> bool:
         'str': str,
         'bool': bool,
         'list': list
+        # number
     }
 
     # Check bool first before int (because bool is subclass of int in Python)
     if expected_type == "int" and isinstance(variable, bool):
         return False
+    
+    # Checking number - Special case: check if string contains only digits (positive whole number)
+    if expected_type == "number":
+        return isinstance(variable, str) and variable.isdigit()
     
     return isinstance(variable, types[expected_type])

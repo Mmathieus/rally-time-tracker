@@ -10,8 +10,8 @@ import database.tools.other as othr
 import re
 
 
-DEFAULT_CAR = cnfg.config['command']['insert']['default_car']
-DEFAULT_CAR_CODE = cnfg.config['command']['insert']['default_car_code']
+DEFAULT_CAR = cnfg.config['command']['insert']['default_car'].strip()
+DEFAULT_CAR_CODE = cnfg.config['command']['insert']['default_car_code'].strip()
 
 CONFIRMATION_SELECT_AFTER_INSERT = cnfg.config['command']['insert']['confirmation_select_after_insert']
 
@@ -34,6 +34,10 @@ INSERT_QUERY = """
 
 
 def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
+    # Check if DB/TABLES exist
+    if not othr.verify_db_exists_state(both_required=True, bad_info_message=ff.colorize(text="INSERT NOT POSSIBLE. {rest}\n", color="YELLOW")):
+        return
+    
     if not rally:
         INPUT_ALIGN_WIDTH = 8
 
@@ -64,12 +68,6 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
             f"{ff.colorize(text="EXPECTED FORMAT: '(M)M:SS:mmm'. MAX - 59:59.999.", color="YELLOW")}\n"
         )
         return
-
-    # Check if DB/TABLE exists (primary)
-    all_ok, info_message = othr.get_db_exists_state(table=cnfg.PRIMARY_TB_NAME, include_table_name=True)
-    if not all_ok:
-        ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
-        return
     
     rally, stage = map(ff.to_pascal_kebab_case, (rally, stage))
     # Replace last ':' for '.'
@@ -91,12 +89,6 @@ def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
                 f"{ff.colorize(text=f"+ {improvement}\n", color="RED")}"
             )
             return
-    
-    # Check if DB/TABLE exists (timings_history)
-    all_ok, info_message = othr.get_db_exists_state(table=cnfg.HISTORY_TB_NAME, include_table_name=True)
-    if not all_ok:
-        ff.print_colored(text=f"INSERT ABORTED. {info_message}\n", color="YELLOW")
-        return
     
     car = DEFAULT_CAR if car == DEFAULT_CAR_CODE else car
 

@@ -33,6 +33,7 @@
             "help": "help",
             "dashboard": "dash",
             "restart": "rst",
+            "settings": "config",
             "end": "end"
         }
     },
@@ -61,8 +62,11 @@
                 "primary_table": "C:/Users/matus/personal/rally-tracker/data/{database}/main.csv",
                 "history_table": "C:/Users/matus/personal/rally-tracker/data/{database}/history.csv"
             },
-            "override_data_on_import": false,
-            "override_data_options": ["y", "yes", "o", "over", "override", "1"]
+            "existing_data_options": {
+                "override": ["y", "yes", "o", "over", "override", "1"],
+                "dont_override": ["n", "no", "not", "d", "dont", "0"]
+            },
+            "override_data_on_import": false
         },
         "export": {
             "default_folder_path": {
@@ -77,15 +81,14 @@
         "import__export": {
             "location_selection": {
                 "GUI": "gui",
-                "Default": "d",
-                "Path": "path"
+                "Default": "d"
             }
         },
         "switch": {
             "dashboard_after_switch": true
         }
     },
-
+    
     "ui": {
         "dashboard": {
             "display_on_startup": true,

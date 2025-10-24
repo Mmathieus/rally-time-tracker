@@ -5,8 +5,8 @@ import subprocess
 def execute_query(sql=None, file=None, pager=False, header=True, capture=False, text=True, check=True, postgres_db=False) -> subprocess.CompletedProcess:    
     command = [
         "psql",
-        "-U", cnfg.config['database']['credentials']['user'],
-        "-d", cnfg.config['database']['credentials']['database'] if not postgres_db else "postgres",
+        "-U", cnfg.config['database']['credentials']['user'].strip(),
+        "-d", cnfg.config['database']['credentials']['database'].strip() if not postgres_db else "postgres",
     ]
 
     if not pager:

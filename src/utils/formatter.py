@@ -1,3 +1,4 @@
+import re
 import unicodedata
 
 
@@ -18,7 +19,8 @@ colors = {
 
 formats = {
     "BOLD": "\033[1m",
-    "DIM": "\033[2m"
+    "DIM": "\033[2m",
+    "ITALIC": "\033[3m"
 }
 
 def print_colored(text, color=None, really_print=True) -> None:
@@ -48,9 +50,14 @@ def display_menu(title="VALID OPTIONS", options=None) -> None:
         print(f"  ○ {option}")
     print()
 
+
 def get_display_width(text) -> int:
+    # Remove ANSI escape codes first
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    clean_text = ansi_escape.sub('', text)
+    
     width = 0
-    for char in text:
+    for char in clean_text:
         if unicodedata.east_asian_width(char) in ('F', 'W'):
             width += 2
         else:

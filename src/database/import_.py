@@ -15,20 +15,23 @@ import re
 import os
 
 
-GUI = cnfg.config['command']['import__export']['location_selection']['GUI']
-DEFAULT = cnfg.config['command']['import__export']['location_selection']['Default']
-PATH = cnfg.config['command']['import__export']['location_selection']['Path']
+GUI = cnfg.config['command']['import__export']['location_selection']['GUI'].strip()
+DEFAULT = cnfg.config['command']['import__export']['location_selection']['Default'].strip()
 
-METHOD_OPTIONS = (GUI, DEFAULT, PATH)
+METHOD_OPTIONS = (GUI, DEFAULT)
+
+OVERRIDE_OPTIONS = cnfg.config['command']['import']['existing_data_options']['override']
+DONT_OVERRIDE_OPTIONS = cnfg.config['command']['import']['existing_data_options']['dont_override']
+EXISTING_DATA_OPTIONS = OVERRIDE_OPTIONS + DONT_OVERRIDE_OPTIONS
 
 TABLE_CONFIG = {
     cnfg.PRIMARY_TB_ALIAS: {
         'import_sql': "\\copy timings FROM '{file_path}' WITH (FORMAT csv);",
-        'default_location': cnfg.config['command']['import']['default_file_path']['primary_table']
+        'default_location': cnfg.config['command']['import']['default_file_path']['primary_table'].strip()
     },
     cnfg.HISTORY_TB_ALIAS: {
         'import_sql': "\\copy timings_history FROM '{file_path}' WITH (FORMAT csv);",
-        'default_location': cnfg.config['command']['import']['default_file_path']['history_table']
+        'default_location': cnfg.config['command']['import']['default_file_path']['history_table'].strip()
     }
 }
 
@@ -36,30 +39,33 @@ TABLE_CONFIG = {
 def import_manager(table, method=None, override=None) -> None:
     # Import on both tables
     if table == cnfg.EVERYTHING_ALIAS:
-        # Selecting file-selection method (Path method excluded (file path is part of the command call and can't be typed afterwards))
+        
+        # Check if DB/TABLES exist
+        if not othr.verify_db_exists_state(bad_info_message=ff.colorize(text="IMPORT NOT POSSIBLE. {rest}\n", color="YELLOW")):
+            return
+
+        # Determine 'method' value
+        method = _determine_method(method=method)
         if not method:
-            LIMITED_METHOD_OPTIONS = (GUI, DEFAULT)
-            ff.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in LIMITED_METHOD_OPTIONS))
-            method = ii.get_user_input()
-
-            if not method:
-                print()
-                return
-
+            return
+            
+        # Determine 'override' value
+        override = _determine_override(override=override)
+        if not override:
+            return
+        
+        print()
+        # GUI 
         if method == GUI:
-            _gui_exec(table=cnfg.PRIMARY_TB_ALIAS, override=override)
-            _gui_exec(table=cnfg.HISTORY_TB_ALIAS, override=override)
-            return
-        elif method == DEFAULT:
-            _default_exec(table=cnfg.PRIMARY_TB_ALIAS, override=override)
-            _default_exec(table=cnfg.HISTORY_TB_ALIAS, override=override)
-            return
+            import_manager(table=cnfg.PRIMARY_TB_ALIAS, method=GUI, override=override)
+            import_manager(table=cnfg.HISTORY_TB_ALIAS, method=GUI, override=override)
+        # DEFAULT
         else:
-            print(
-                f"{ff.colorize(text=f"INVALID CHOICE '{method}'.", color="RED")} "
-                f"{ff.colorize(text=f" ONLY '{GUI}' AND '{DEFAULT}' ALLOWED.", color="YELLOW")}\n"
-            )
-            return
+            import_manager(table=cnfg.PRIMARY_TB_ALIAS, method=DEFAULT, override=override)
+            import_manager(table=cnfg.HISTORY_TB_ALIAS, method=DEFAULT, override=override)
+        return
+            
+
 
     # Check table name
     if table not in cnfg.BOTH_TABLES:
@@ -67,47 +73,37 @@ def import_manager(table, method=None, override=None) -> None:
         return
     
     # Check if DB/TABLE exists
-    all_ok, info_message = othr.get_db_exists_state(table=cnfg.get_tb_name(table=table))
-    if not all_ok:
-        ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} {info_message}\n", color="YELLOW")
+    if not othr.evaluate_db_exists_state(
+        table=cnfg.get_tb_name(table=table),
+        info_message=ff.colorize(text="IMPORT NOT POSSIBLE. {rest}\n", color="YELLOW")
+    )[0]:
         return
     
-    # Method was selected
-    if method:
-        if method == GUI:
-            _gui_exec(table=table, override=override)
-        elif method == DEFAULT:
-            _default_exec(table=table, override=override)
-        else:
-            _path_exec(table=table, file_path=method, override=override)
-        return
 
-    # Method wasn't selected - Asking for it
-    ff.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
-    method_choice = ii.get_user_input()
-    
-    # Validating selected method
-    validated, validation_message = vv.validate_choice(choice=method_choice, valid_options=METHOD_OPTIONS)
-    if not validated:
-        if validation_message:
-            print(ff.colorize(text=validation_message, color="RED"))
-        print()
+    # Determine 'method' value
+    method = _determine_method(method=method)
+    if not method:
         return
     
-    # Calling import (asking for path if selected method is Path)
-    if method_choice == GUI:
+    # Determine 'override' value
+    override = _determine_override(override=override)
+    if not override:
+        return
+    
+    
+    # GUI 
+    if method == GUI:
         _gui_exec(table=table, override=override)
-    elif method_choice == DEFAULT:
-        _default_exec(table=table, override=override)
+    # DEFAULT
     else:
-        file_path = ii.get_user_input(prompt="Enter full path to the CSV file including the file name and .csv", lowercase=False)
-        _path_exec(table=table, file_path=file_path, override=override)
+        _default_exec(table=table, override=override)
 
 
 def _gui_exec(table, override) -> None:
     root = tk.Tk()
     root.withdraw()
     
+    # GUI selector
     file_path = filedialog.askopenfilename(
         title=f"Select CSV file for table: {cnfg.get_tb_name(table=table)}",
         filetypes=[("CSV files", "*.csv")]
@@ -134,38 +130,9 @@ def _default_exec(table, override) -> None:
     
     _call_import(table=table, file_path=FilePath, override=override)
 
-def _path_exec(table, file_path, override) -> None:
-    # Checking file path from user
-    is_valid, FilePath = _validate_file_path(path=file_path)
-
-    if not is_valid:
-        ff.print_colored(text=f"{_get_unsuccessful_import_message(table=table)} INVALID FILE PATH.\n", color="YELLOW")
-        return
-
-    _call_import(table=table, file_path=FilePath, override=override)
-
-
-def _validate_file_path(path) -> tuple[bool, Path | None]: 
-    # If empty
-    if not path.strip():
-        return False, None
-    
-    # Quotation marks removed
-    path = path.replace('"', '').replace("'", '')
-    
-    FilePath = Path(path)
-    FilePath = FilePath.resolve()
-    
-    if not FilePath.exists() or not FilePath.is_file() or FilePath.suffix.lower() != '.csv':
-        return False, FilePath
-    return True, FilePath
 
 def _call_import(table, file_path, override) -> None:
-    doing_override = _should_override(override=override)
-    # result = None
-    # override_message = ""
-
-    if doing_override:
+    if override in OVERRIDE_OPTIONS:
         TABLE_NAME = cnfg.get_tb_name(table=table)
 
         transaction = f"""
@@ -203,16 +170,56 @@ def _call_import(table, file_path, override) -> None:
     ff.print_colored( text=f"IMPORT INTO '{cnfg.get_tb_name(table=table)}' SUCCESSFUL. {imported_rows_count} ROWS. {override_message}\n", color="GREEN")
 
 
-def _should_override(override) -> bool:
+def _validate_file_path(path) -> tuple[bool, Path | None]: 
+    # If empty
+    if not path.strip():
+        return False, None
+    
+    # Quotation marks removed
+    path = path.replace('"', '').replace("'", '')
+    
+    FilePath = Path(path)
+    FilePath = FilePath.resolve()
+    
+    # Conditions
+    if not FilePath.exists() or not FilePath.is_file() or FilePath.suffix.lower() != '.csv':
+        return False, FilePath
+    return True, FilePath
+
+
+def _determine_method(method) -> str | None:
+    #1 - Asking for 'method' if not already typed
+    #2 - Validating 'method'
+
+    # Method not typed - Asking for it
+    if not method:
+        ff.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
+        method = ii.get_user_input()
+
+    # Validate method
+    validated, validation_message = vv.validate_choice(choice=method, valid_options=METHOD_OPTIONS, choice_name="FILE SELECTION")
+    if not validated:
+        if validation_message:
+            ff.print_colored(text=f"{validation_message}", color="RED")
+        print()
+        return None
+    return method
+
+def _determine_override(override) -> str | None:
+    #1 - Validating 'override' if already typed
+    #2 - Using config.json default 'override' value
+
+    # Validate 'override' typed by user
     if override:
-        OVERRIDE_OPTIONS = cnfg.config['command']['import']['override_data_options']
+        validated, validation_message = vv.validate_choice(choice=override, valid_options=EXISTING_DATA_OPTIONS, choice_name="OVERRIDE OPTION")
+        if not validated:
+            ff.print_colored(text=f"{validation_message}\n", color="RED")
+            return None
+        return override
 
-        validated, validation_message = vv.validate_choice(choice=override, valid_options=OVERRIDE_OPTIONS)
-        # No need to print that 'override' choice is OK. If it's not, validated=False automatically
-        return validated
-
-    # If override not selected. Using value from config.json
-    return cnfg.config['command']['import']['override_data_on_import']
+    # Taking value from config.json
+    CONFIG_OVERRIDE_DATA = cnfg.config['command']['import']['override_data_on_import']
+    return OVERRIDE_OPTIONS[0] if CONFIG_OVERRIDE_DATA else DONT_OVERRIDE_OPTIONS[0]
 
 
 def _get_unsuccessful_import_message(table) -> str:

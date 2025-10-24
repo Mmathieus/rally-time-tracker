@@ -30,8 +30,8 @@ db_state = {
 }
 
 
-DB_NAME = config['database']['credentials']['database']
-DB_ALIAS = config['database']['reference']
+DB_NAME = config['database']['credentials']['database'].strip()
+DB_ALIAS = config['database']['reference'].strip()
 
 def update_db_name_globally() -> None:
     global DB_NAME
@@ -39,10 +39,10 @@ def update_db_name_globally() -> None:
 
 
 PRIMARY_TB_NAME = "timings"
-PRIMARY_TB_ALIAS = config['table']['reference']['primary_table']
+PRIMARY_TB_ALIAS = config['table']['reference']['primary_table'].strip()
 
 HISTORY_TB_NAME = "timings_history"
-HISTORY_TB_ALIAS = config['table']['reference']['history_table']
+HISTORY_TB_ALIAS = config['table']['reference']['history_table'].strip()
 
 TABLE_MAPPING = {
     PRIMARY_TB_ALIAS: PRIMARY_TB_NAME,
@@ -54,9 +54,9 @@ def get_tb_name(table) -> str:
 
 BOTH_TABLES = (PRIMARY_TB_ALIAS, HISTORY_TB_ALIAS)
 
-TABLES_ALIAS = config['table']['reference']['both_tables']
+TABLES_ALIAS = config['table']['reference']['both_tables'].strip()
 
-EVERYTHING_ALIAS = config['other_reference']['everything']
+EVERYTHING_ALIAS = config['other_reference']['everything'].strip()
 
 
 COMMANDS_ALIAS = config['other_reference']['commands']

@@ -5,9 +5,10 @@ import database.tools.other as othr
 
 
 def psql_exec() -> None:
-    all_ok, info_message = othr.get_db_exists_state()
-    if not all_ok:
-        ff.print_colored(text=f"PSQL SHELL NOT AVAILABLE. {info_message}\n", color="YELLOW")
+    # Check if DB exists
+    if not othr.evaluate_db_exists_state(
+        info_message=ff.colorize(text="PSQL SHELL NOT AVAILABLE. {info_message}\n", color="YELLOW")
+    )[0]:
         return
 
     ff.print_colored(text="OPENING PSQL SHELL...\n", color="GREEN")

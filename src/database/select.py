@@ -18,20 +18,21 @@ DEFAULT_ORDER = " ORDER BY rally, time, stage;"
 
 def select_manager(search_term=None, time_order=None, order_limit=None) -> None:
     # Check if DB/TABLE exists (primary)
-    all_ok, info_message = othr.get_db_exists_state(table=cnfg.PRIMARY_TB_NAME, include_table_name=True)
-    if not all_ok:
-        ff.print_colored(text=f"RECORD(S) NOT RETRIEVED. {info_message}\n", color="YELLOW")
-        return False
+    if not othr.evaluate_db_exists_state(
+        table=cnfg.PRIMARY_TB_NAME, info_message=ff.colorize(text="RECORD(S) NOT RETRIEVED. {rest}\n", color="YELLOW")
+    )[0]:
+        return
     
+    # Something directly after command
     if search_term:
         select_exec(search_term=ff.to_pascal_kebab_case(term=search_term), time_order=time_order, order_limit=order_limit)
         return
     
-    # Selecting RALLY
+    # Selecting RALLY + formatting
     rally = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="RALLY", autocomplete_options=list(cnfg.WRC_RALLIES.keys())))
 
     stage_options = cnfg.get_stages(rally=rally)
-    # Selecting STAGE
+    # Selecting STAGE + formatting
     stage = ff.to_pascal_kebab_case(term=ii.get_user_input(prompt="STAGE", autocomplete_options=stage_options))
 
     select_exec(rally=rally, stage=stage)
