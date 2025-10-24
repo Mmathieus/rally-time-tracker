@@ -20,6 +20,7 @@ import database.tools.switch as swtch
 import services.help as hlp
 import services.dashboard as dshbrd
 import services.restart as rstrt
+import services.settings as sttngs
 import services.end as end
 
 
@@ -109,8 +110,8 @@ commands = {
     cnfg.COMMANDS_ALIAS['delete']: {
         'emoji': '🗑️',
         'calls': {
-            1: lambda T: dlt.delete_manager(table=T),
-            2: lambda T, ID: dlt.delete_manager(table=T, record_id=ID)
+            1: lambda T: dlt.delete_manager(target=T),
+            2: lambda T, ID: dlt.delete_manager(target=T, record_id=ID)
         },
         'args': {
             1: ("<table>",),
@@ -179,6 +180,15 @@ commands = {
         'emoji': '🔃',
         'calls': {
             0: lambda: rstrt.restart_program()
+        },
+        'args': {
+            0: ()
+        }
+    },
+    cnfg.COMMANDS_ALIAS['settings']: {
+        'emoji': '⚙️',
+        'calls': {
+            0: lambda: sttngs.json_settings_exec()
         },
         'args': {
             0: ()
