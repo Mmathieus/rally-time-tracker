@@ -3,9 +3,11 @@ import config as cnfg
 import utils.formatter as ff
 import utils.inputter as ii
 import utils.validator as vv
+import utils.other as u_othr
 
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
+import database.tools.state as stt
 import database.tools.other as othr
 
 from pathlib import Path
@@ -41,7 +43,7 @@ def import_manager(table, method=None, override=None) -> None:
     if table == cnfg.EVERYTHING_ALIAS:
         
         # Check if DB/TABLES exist
-        if not othr.verify_db_exists_state(bad_info_message=ff.colorize(text="IMPORT NOT POSSIBLE. {rest}\n", color="YELLOW")):
+        if not stt.verify_db_exists_state(bad_info_message=ff.colorize(text="IMPORT NOT POSSIBLE. {rest}\n", color="YELLOW")):
             return
 
         # Determine 'method' value
@@ -73,7 +75,7 @@ def import_manager(table, method=None, override=None) -> None:
         return
     
     # Check if DB/TABLE exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.get_tb_name(table=table),
         info_message=ff.colorize(text="IMPORT NOT POSSIBLE. {rest}\n", color="YELLOW")
     )[0]:
@@ -193,7 +195,7 @@ def _determine_method(method) -> str | None:
 
     # Method not typed - Asking for it
     if not method:
-        ff.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
+        u_othr.display_menu(title="FILE SELECTION", options=tuple(opt.capitalize() for opt in METHOD_OPTIONS))
         method = ii.get_user_input()
 
     # Validate method

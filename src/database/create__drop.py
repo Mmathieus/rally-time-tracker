@@ -3,7 +3,7 @@ import config as cnfg
 import utils.formatter as ff
 
 import database.tools.executor as exe
-import database.tools.other as othr
+import database.tools.state as stt
 
 from pathlib import Path
 import re
@@ -46,7 +46,7 @@ def create_exec(target) -> None:
 
 def create_table(table, print_confirmation=True) -> None:
     # Check if DB/TABLE exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.get_tb_name(table=table),
         must_exists=False,
         info_message=ff.colorize(text=f"TABLE '{cnfg.get_tb_name(table=table)}' NOT CREATED. {{rest}}\n", color="YELLOW")
@@ -61,7 +61,7 @@ def create_table(table, print_confirmation=True) -> None:
 
 def _create_database() -> None:
     # Check if DB exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         must_exists=False,
         info_message=ff.colorize(text=f"DATABASE '{cnfg.DB_NAME}' NOT CREATED. {{rest}}\n", color="YELLOW")
     )[0]:
@@ -109,7 +109,7 @@ def drop_exec(target) -> None:
 
 def drop_table(table, print_confirmation=True) -> None:
     # Check if DB/TABLE exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.get_tb_name(table=table),
         info_message=ff.colorize(text=f"TABLE '{cnfg.get_tb_name(table=table)}' NOT DROPPED. {{rest}}\n", color="YELLOW")
     )[0]:
@@ -123,7 +123,7 @@ def drop_table(table, print_confirmation=True) -> None:
 
 def _drop_database() -> None:
     # Check if DB exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         info_message=ff.colorize(text=f"DATABASE '{cnfg.DB_NAME}' NOT DROPPED. {{rest}}\n", color="YELLOW")
     )[0]:
         return

@@ -3,6 +3,7 @@ import config as cnfg
 import utils.formatter as ff
 import utils.inputter as ii
 import utils.validator as vv
+import utils.other as u_othr
 
 import database.tools.state as stt
 
@@ -27,7 +28,7 @@ def switch_manager(database=None) -> None:
             database, = VALID_DATABASES
         # More than 1 to choose from
         else:
-            ff.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES)
+            u_othr.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES)
             database = ii.get_user_input(autocomplete_options=VALID_DATABASES)
             if not database:
                 print()

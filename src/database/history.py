@@ -4,7 +4,7 @@ import utils.formatter as ff
 import utils.inputter as ii
 
 import database.tools.executor as exe
-import database.tools.other as othr
+import database.tools.state as stt
 
 
 HISTORY_QUERY_ALL = """
@@ -31,7 +31,7 @@ HISTORY_QUERY_SPECIFIC = """
 
 def history_manager(stage=None) -> None:
     # Check if DB/TABLE exists (history)
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.HISTORY_TB_NAME,
         info_message=ff.colorize(text="RECORD(S) NOT RETRIEVED. {rest}\n", color="YELLOW")
     )[0]:

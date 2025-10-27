@@ -5,7 +5,7 @@ import utils.inputter as ii
 import utils.validator as vv
 
 import database.tools.executor as exe
-import database.tools.other as othr
+import database.tools.state as stt
 
 
 TABLE_CONFIG = {
@@ -23,7 +23,7 @@ def delete_manager(target, record_id=None):
     if target == cnfg.EVERYTHING_ALIAS:
         
         # Check if DB/TABLES exist
-        if not othr.verify_db_exists_state(bad_info_message=ff.colorize(text="DELETE NOT POSSIBLE. {rest}\n", color="YELLOW")):
+        if not stt.verify_db_exists_state(bad_info_message=ff.colorize(text="DELETE NOT POSSIBLE. {rest}\n", color="YELLOW")):
             return
         
         # ID not typed
@@ -50,7 +50,7 @@ def delete_manager(target, record_id=None):
         return
 
     # Check if DB/TABLE exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.get_tb_name(table=target),
         info_message=ff.colorize(text="DELETE NOT POSSIBLE. {rest}\n", color="YELLOW")
     )[0]:

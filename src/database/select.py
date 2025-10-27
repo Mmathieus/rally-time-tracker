@@ -5,7 +5,7 @@ import utils.inputter as ii
 import utils.validator as vv
 
 import database.tools.executor as exe
-import database.tools.other as othr
+import database.tools.state as stt
 
 
 RECORDS_FROM_OLDEST = cnfg.config['command']['select']['records_order']['from_oldest']
@@ -18,7 +18,7 @@ DEFAULT_ORDER = " ORDER BY rally, time, stage;"
 
 def select_manager(search_term=None, time_order=None, order_limit=None) -> None:
     # Check if DB/TABLE exists (primary)
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.PRIMARY_TB_NAME, info_message=ff.colorize(text="RECORD(S) NOT RETRIEVED. {rest}\n", color="YELLOW")
     )[0]:
         return

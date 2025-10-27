@@ -5,7 +5,7 @@ import utils.inputter as ii
 
 import database.select as slct
 import database.tools.executor as exe
-import database.tools.other as othr
+import database.tools.state as stt
 
 import re
 
@@ -35,7 +35,7 @@ INSERT_QUERY = """
 
 def insert_manager(rally=None, stage=None, car=None, time=None) -> None:
     # Check if DB/TABLES exist
-    if not othr.verify_db_exists_state(both_required=True, bad_info_message=ff.colorize(text="INSERT NOT POSSIBLE. {rest}\n", color="YELLOW")):
+    if not stt.verify_db_exists_state(both_required=True, bad_info_message=ff.colorize(text="INSERT NOT POSSIBLE. {rest}\n", color="YELLOW")):
         return
     
     if not rally:

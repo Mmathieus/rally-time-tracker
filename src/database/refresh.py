@@ -6,6 +6,7 @@ import utils.validator as vv
 import database.create__drop as cd
 import database.tools.executor as exe
 import database.tools.sequence as sqnc
+import database.tools.state as stt
 import database.tools.other as othr
 
 import os
@@ -35,7 +36,7 @@ def refresh_manager(target, keep_data=None) -> None:
         return
     
     # Check if DB/TABLE exists
-    if not othr.evaluate_db_exists_state(
+    if not stt.check_db_exists_state(
         table=cnfg.get_tb_name(table=target),
         info_message=ff.colorize(text=f"TABLE '{cnfg.get_tb_name(table=target)}' NOT REFRESHED. {{rest}} \n", color="YELLOW")
     )[0]:
