@@ -67,9 +67,9 @@ commands = {
         },
         'args': {
             0: (),
-            1: ("[search_term]",),
-            2: ("[search_term]", "[time_order]"),
-            3: ("[search_term]", "[time_order]", "[order_limit]")
+            1: ("[search_term|all]",),
+            2: ("[search_term|all]", "[time_order]"),
+            3: ("[search_term|all]", "[time_order]", "[order_limit]")
         }
     },
     cnfg.COMMANDS_ALIAS['history']: {
@@ -80,7 +80,7 @@ commands = {
         },
         'args': {
             0: (),
-            1: ("[stage]",) 
+            1: ("[stage|all]",) 
         }
     },
     cnfg.COMMANDS_ALIAS['import']: {
@@ -114,8 +114,8 @@ commands = {
             2: lambda T, ID: dlt.delete_manager(target=T, record_id=ID)
         },
         'args': {
-            1: ("<table>",),
-            2: ("<table>", "[id]")
+            1: ("<table|all>",),
+            2: ("<table|all>", "[id]")
         }
     },
     cnfg.COMMANDS_ALIAS['refresh']: {
