@@ -28,7 +28,8 @@ def switch_manager(database=None) -> None:
             database, = VALID_DATABASES
         # More than 1 to choose from
         else:
-            u_othr.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES)
+            if not u_othr.display_menu(title="DATABASE OPTIONS", options=VALID_DATABASES):
+                return
             database = ii.get_user_input(autocomplete_options=VALID_DATABASES)
             if not database:
                 print()
@@ -38,7 +39,7 @@ def switch_manager(database=None) -> None:
 
     # Switch to current db -> no need for that
     if database == CURRENT_DB:
-        ff.print_colored(text=f"ALREADY ON '{CURRENT_DB}' DATABASE.\n", color="YELLOW")
+        ff.print_colored(text=f"ALREADY ON '{CURRENT_DB}' DATABASE.\n", color="GREEN")
         return
 
     # Validate 'database' typed by user
