@@ -4,10 +4,10 @@ import unicodedata
 import re
 
 
-def display_menu(title="VALID OPTIONS", options=None) -> None:
+def display_menu(title="VALID OPTIONS", options=None) -> bool:
     if not options:
         ff.print_colored(text="NO OPTIONS AVAILABLE\n", color="YELLOW")
-        return
+        return False
     
     print(f"\n╭{'─' * (len(title) + 4)}╮")
     print(f"│  {title}  │")
@@ -16,6 +16,7 @@ def display_menu(title="VALID OPTIONS", options=None) -> None:
     for option in options:
         print(f"  ○ {option}")
     print()
+    return True
 
 
 def get_display_width(text) -> int:
