@@ -2,9 +2,9 @@
     "database": {
         "credentials": {
             "user": "postgres",
-            "database": "wrc10database"
+            "database": "rallydb"
         },
-        "available_databases": ["wrc9database", "wrc10database"],
+        "available_databases": ["rallydb"],
         "reference": "db"
     },
 
@@ -31,8 +31,8 @@
             "drop": "drop",
             "switch": "switch",
             "help": "help",
-            "dashboard": "dash",
-            "restart": "rst",
+            "dashboard": "dashboard",
+            "restart": "restart",
             "settings": "config",
             "end": "end"
         }
@@ -59,8 +59,8 @@
         },
         "import": {
             "default_file_path": {
-                "primary_table": "C:/Users/matus/personal/rally-tracker/data/{database}/main.csv",
-                "history_table": "C:/Users/matus/personal/rally-tracker/data/{database}/history.csv"
+                "primary_table": "data/{database}/main.csv",
+                "history_table": "data/{database}/history.csv"
             },
             "existing_data_options": {
                 "override": ["y", "yes", "o", "over", "override", "1"],
@@ -70,8 +70,8 @@
         },
         "export": {
             "default_folder_path": {
-                "primary_table": "C:/Users/matus/personal/rally-tracker/data/{database}",
-                "history_table": "C:/Users/matus/personal/rally-tracker/data/{database}"
+                "primary_table": "data/{database}",
+                "history_table": "data/{database}"
             },
             "default_file_name": {
                 "primary_table": "main.csv",
@@ -81,7 +81,7 @@
         "import__export": {
             "location_selection": {
                 "GUI": "gui",
-                "Default": "d"
+                "Default": "default"
             }
         },
         "switch": {
@@ -101,9 +101,6 @@
             "main_menu_column_width": 25,
             "main_menu_columns_spacing": 8,
             "arguments_menu_width": -1
-        },
-        "error": {
-            "separator_count": 58
         }
     },
 

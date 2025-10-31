@@ -8,11 +8,10 @@ $pgpassDir = Split-Path -Parent $pgpassPath
 # Format: @("host", "port", "database", "username", "password")
 # Add more entries as needed for multiple databases
 $credentials = @(
-    @("localhost", "5432", "postgres", "postgres", "estonia"),
+    @("localhost", "5432", "rallydb", "postgres", "1234"),
     # Uncomment and modify the lines below to add more databases:
-    @("localhost", "5432", "wrc9database", "postgres", "estonia"),
-    @("localhost", "5432", "wrc10database", "postgres", "estonia"),
-    @("localhost", "5432", "test123", "postgres", "estonia")
+    # @("localhost", "5432", "wrc9db", "postgres", "mypassword"),
+    # @("localhost", "5432", "wrc10db", "postgres", "mypassword")
 )
 
 try {
