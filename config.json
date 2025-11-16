@@ -125,6 +125,7 @@
             "Belgium": ["Dikkebus", "Kemmelberg"],
             "Greece": ["Psatha", "Amfissa", "Paleohori"],
             "Spain": ["Riudecanyes", "Savalla"],
+            "Sanremo": ["1974", "1981", "1997", "1998"],
             "Chile": ["Lircay", "Biobio", "Pelun"]
         },
         "cars": ["i20", "yaris", "fiesta"]
