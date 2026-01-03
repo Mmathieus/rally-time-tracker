@@ -71,7 +71,7 @@ def _create_database() -> None:
         CREATE DATABASE {cnfg.DB_NAME}
             TEMPLATE = template0
             ENCODING = 'UTF8'
-            ICU_LOCALE = 'sk-SK',
+            ICU_LOCALE = 'en-US'
             LOCALE_PROVIDER = 'icu';
     """
 
