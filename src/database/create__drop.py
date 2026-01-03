@@ -69,10 +69,10 @@ def _create_database() -> None:
     
     CREATE_DB_SQL = f"""
         CREATE DATABASE {cnfg.DB_NAME}
+            TEMPLATE = template0
             ENCODING = 'UTF8'
-            LC_COLLATE = 'en_US.UTF-8'
-            LC_CTYPE = 'en_US.UTF-8'
-            TEMPLATE = template0;
+            ICU_LOCALE = 'sk-SK',
+            LOCALE_PROVIDER = 'icu';
     """
 
     exe.execute_query(sql=CREATE_DB_SQL, header=False, capture=True, postgres_db=True)
