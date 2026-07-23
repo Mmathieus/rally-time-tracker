@@ -14,7 +14,11 @@ def execute_query(sql=None, file=None, pager=False, header=True, capture=False, 
 
     if not header:
         command.append("-t")
-    
+
+    # Output is captured -> a password prompt would be invisible and psql would hang forever
+    if capture:
+        command.append("-w")
+
     if sql:
         command.extend(["-c", sql])
     
@@ -28,6 +32,7 @@ def execute_query(sql=None, file=None, pager=False, header=True, capture=False, 
 # -d database    : Connect to specified database
 # -P pager=off   : Disable pager (show all output at once)
 # -t             : tuples_only mode (no headers/footers)
+# -w             : Never prompt for password (fail instead of waiting forever)
 # -c "command"   : Execute command and exit
 # -f             : Execute file and exit
 

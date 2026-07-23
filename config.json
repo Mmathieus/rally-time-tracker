@@ -92,8 +92,6 @@
     "ui": {
         "dashboard": {
             "display_on_startup": true,
-            "db_box_width": 23,
-            "table_box_width": 27,
             "vertical_spacing": 3,
             "padding": 3
         },

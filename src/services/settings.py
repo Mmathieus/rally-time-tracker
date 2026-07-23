@@ -9,7 +9,7 @@ def json_settings_exec() -> None:
     
     # Check if file exists
     if not config_path.exists():
-        ff.print_colored(text="CONFIG FILE 'config.json' NOT FOUND IN PROJET ROOT\n", color="RED")
+        ff.print_colored(text="CONFIG FILE 'config.json' NOT FOUND IN PROJECT ROOT\n", color="RED")
         return
     
     ff.print_colored(text="OPENING EDITOR...\nCLOSE EDITOR TO CONTINUE.\n", color="GREEN")
