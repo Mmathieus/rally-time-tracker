@@ -1,16 +1,41 @@
-MIT License
+Rally Time Tracker License
 
 Copyright (c) 2025 Mmathieus
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is granted, free of charge, to any person or noncommercial
+organization obtaining a copy of this software and associated documentation
+files (the "Software"), to use the Software and to modify it for their own
+use, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. Noncommercial use only.
+   The Software may be used for personal purposes (hobby, study, private use)
+   and by noncommercial organizations (charities, schools, research and
+   public institutions).
+   Building the Software into your own project is permitted as long as
+   that project is itself used only in this way.
+   Any use intended for commercial advantage or monetary compensation is not
+   permitted. This includes selling the Software, offering it as a paid
+   service and including it in a commercial product or service.
+
+2. No distribution.
+   The Software, modified or not, may not be published, distributed,
+   sublicensed or sold.
+   A modified version is for the use of the person or organization that
+   made it.
+
+3. Notice.
+   The above copyright notice and this license text must remain in every
+   copy of the Software.
+
+4. Contributions.
+   Anyone who submits a change to the Software (a pull request, a patch or
+   code in an issue) keeps the copyright in it and grants the copyright
+   holder of the Software a permanent, free right to use, modify, publish
+   and distribute it as part of the Software under this license.
+
+5. No other rights.
+   Anything not expressly permitted above requires prior written permission
+   from the copyright holder.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

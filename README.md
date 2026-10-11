@@ -452,4 +452,10 @@ Contributions are welcome via pull requests for bug fixes, documentation improve
 
 ---
 
+## 📄 **License**
+
+Source-available, not open source. Free for personal and noncommercial use, including changes for your own use. Redistribution and commercial use are not permitted. See [LICENSE](LICENSE) for the full terms.
+
+---
+
 ### Hope you find this application useful on your journey to perfect stage times.
